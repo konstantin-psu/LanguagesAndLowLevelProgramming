@@ -1,0 +1,112 @@
+   1              	
+   2              		.equ	ROWS, 		25		# number of rows
+   3              		.equ	COLS, 		80		# number of columns
+   4              	
+   5              		.equ	CHARBYTES,	2		# total #bytes per char
+   6              		.equ	ROWBYTES,	COLS*CHARBYTES	# total #bytes per row
+   7              		.equ	SCREENBYTES,	ROWS*ROWBYTES	# total #bytes per screen
+   8              	
+   9              		.equ	SPACE,		32		# blank space
+  10              		.equ	NEWLINE,	'\n'		# newline character
+  11              	
+  12              		.equ	DEFAULT_ATTR, 	0x2e		# PSU Green
+  13              	
+  14              		.data
+  15              	
+  16              	        # Reserve space for a video ram frame buffer with
+  17              	        # 25 rows; 80 columns; and one code and one attribute
+  18              	        # byte per character.
+  19              		.globl  video
+  20              		.align	4
+  21 0000 00000000 	video:	.space	SCREENBYTES
+  21      00000000 
+  21      00000000 
+  21      00000000 
+  21      00000000 
+  22              	
+  23              	        # Some variables to hold the current row, column, and
+  24              		# video attribute:
+  25              		.align	4
+  26 0fa0 00000000 	row:	.long	0		# we will only use the least significant
+  27 0fa4 00000000 	col:	.long	0		# bytes of these variables
+  28 0fa8 00000000 	attr:	.long	0
+  29              	
+  30              		.text
+  31              	
+  32              		# Clear the screen, setting all characters to SPACE
+  33              	        # using the DEFAULT_ATTR attribute.
+  34              		.globl	cls
+  35 0000 55       	cls:	pushl	%ebp
+  36 0001 89E5     		movl	%esp, %ebp
+  37              		# Fill me in!
+  38              	
+  39 0003 B9500000 	    movl $COLS, %ecx
+  39      00
+  40 0008 BA000000 	    movl $video, %edx           # need $ sign to read address of video
+  40      00
+  41              	
+  42 000d C6050000 	1: movb $'A', video
+  42      000041
+  43 0014 C642012E 	      movb $DEFAULT_ATTR, 1(%edx)   # same as video+1
+  44 0018 83C202   	      addl $2, %edx
+  45 001b 49       	      decl %ecx
+  46              	
+  47 001c 75EF     	    jnz 1b  #search for label 1 backwards
+  48              	    # jnz loop  #search for label loop
+  49              	
+  50              	
+  51              	
+  52 001e 89EC     		movl	%ebp, %esp
+  53 0020 5D       		popl	%ebp
+  54 0021 C3       		ret
+  55              	
+  56              		# Set the video attribute for characters output using outc.
+  57              		.globl	setAttr
+  58 0022 55       	setAttr:pushl	%ebp
+  59 0023 89E5     		movl	%esp, %ebp
+  60              		# Fill me in!
+  61 0025 89EC     		movl	%ebp, %esp
+  62 0027 5D       		popl	%ebp
+  63 0028 C3       		ret
+  64              	
+  65              		# Output a single character at the current row and col position
+  66              		# on screen, advancing the cursor coordinates and scrolling the
+  67              		# screen as appropriate.  Special treatment is provided for
+  68              	        # NEWLINE characters, moving the "cursor" to the start of the
+  69              		# "next line".
+  70              		.globl	outc
+  71 0029 55       	outc:	pushl	%ebp
+  72 002a 89E5     		movl	%esp, %ebp
+  73              		# Fill me in!
+  74 002c 89EC     		movl	%ebp, %esp
+  75 002e 5D       		popl	%ebp
+  76 002f C3       		ret
+  77              	
+  78              		# Output an unsigned numeric value as a sequence of 8 hex digits.
+  79              		.globl	outhex
+  80 0030 55       	outhex:	pushl	%ebp
+  81 0031 89E5     		movl	%esp, %ebp
+  82              		# Fill me in!
+  83 0033 89EC     		movl	%ebp, %esp
+  84 0035 5D       		popl	%ebp
+  85 0036 C3       		ret
+  86              	
+DEFINED SYMBOLS
+          videoasm.s:2      *ABS*:0000000000000019 ROWS
+          videoasm.s:3      *ABS*:0000000000000050 COLS
+          videoasm.s:5      *ABS*:0000000000000002 CHARBYTES
+          videoasm.s:6      *ABS*:00000000000000a0 ROWBYTES
+          videoasm.s:7      *ABS*:0000000000000fa0 SCREENBYTES
+          videoasm.s:9      *ABS*:0000000000000020 SPACE
+          videoasm.s:10     *ABS*:000000000000000a NEWLINE
+          videoasm.s:12     *ABS*:000000000000002e DEFAULT_ATTR
+          videoasm.s:21     .data:0000000000000000 video
+          videoasm.s:26     .data:0000000000000fa0 row
+          videoasm.s:27     .data:0000000000000fa4 col
+          videoasm.s:28     .data:0000000000000fa8 attr
+          videoasm.s:35     .text:0000000000000000 cls
+          videoasm.s:58     .text:0000000000000022 setAttr
+          videoasm.s:71     .text:0000000000000029 outc
+          videoasm.s:80     .text:0000000000000030 outhex
+
+NO UNDEFINED SYMBOLS
