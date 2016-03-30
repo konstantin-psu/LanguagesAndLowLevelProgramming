@@ -35,20 +35,17 @@ attr:	.long	0
 cls:	pushl	%ebp
 	    movl	%esp, %ebp
 	    # Fill me in!
-        movw $(DEFAULT_ATTR<<8 | SPACE), %ax
 
-        movl $SCREENBYTES/2, %ecx
+        movl $(SCREENBYTES/4), %ecx
         movl $video, %edx           # need $ sign to read address of video
+        .equ HALF, (DEFAULT_ATTR<<8) | SPACE
+        .equ FULL, (HALF<<16) | HALF
 
 1:      
-        movw %ax, (%edx)
-        # movb $' ', (%edx)
-        # movb $DEFAULT_ATTR, 1(%edx)   # same as video+1
-        addl $2, %edx
+        movl $FULL, (%edx)
+        addl $4, %edx
         decl %ecx
-
-        jnz 1b  #search for label 1 backwards
-        # jnz loop  #search for label loop
+        jnz 1b 
 
 
 
