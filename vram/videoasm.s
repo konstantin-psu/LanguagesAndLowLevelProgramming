@@ -33,19 +33,19 @@ attr:	.long	0
         # using the DEFAULT_ATTR attribute.
 	.globl	cls
 cls:	pushl	%ebp
-	movl	%esp, %ebp
-	# Fill me in!
+	    movl	%esp, %ebp
+	    # Fill me in!
 
-    movl $COLS, %ecx
-    movl $video, %edx           # need $ sign to read address of video
+        movl $SCREENBYTES/2, %ecx
+        movl $video, %edx           # need $ sign to read address of video
 
-1: movb $'A', video
-      movb $DEFAULT_ATTR, 1(%edx)   # same as video+1
-      addl $2, %edx
-      decl %ecx
+1:      movb $' ', (%edx)
+        movb $DEFAULT_ATTR, 1(%edx)   # same as video+1
+        addl $2, %edx
+        decl %ecx
 
-    jnz 1b  #search for label 1 backwards
-    # jnz loop  #search for label loop
+        jnz 1b  #search for label 1 backwards
+        # jnz loop  #search for label loop
 
 
 
