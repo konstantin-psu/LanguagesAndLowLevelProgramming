@@ -35,12 +35,15 @@ attr:	.long	0
 cls:	pushl	%ebp
 	    movl	%esp, %ebp
 	    # Fill me in!
+        movw $(DEFAULT_ATTR<<8 | SPACE), %ax
 
         movl $SCREENBYTES/2, %ecx
         movl $video, %edx           # need $ sign to read address of video
 
-1:      movb $' ', (%edx)
-        movb $DEFAULT_ATTR, 1(%edx)   # same as video+1
+1:      
+        movw %ax, (%edx)
+        # movb $' ', (%edx)
+        # movb $DEFAULT_ATTR, 1(%edx)   # same as video+1
         addl $2, %edx
         decl %ecx
 
