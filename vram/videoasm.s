@@ -71,6 +71,12 @@ setAttr:pushl	%ebp
 outc:	pushl	%ebp
 	movl	%esp, %ebp
 	# Fill me in!
+
+    movl $video, %edx           # need $ sign to read address of video
+    movb 8(%ebp), %ah
+    movb %ah, video
+    
+
 	movl	%ebp, %esp
 	popl	%ebp
 	ret
