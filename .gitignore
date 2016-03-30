@@ -1,0 +1,5 @@
+*.o
+*.lst
+./vram/video1
+./vram/video2
+./vram/video3
