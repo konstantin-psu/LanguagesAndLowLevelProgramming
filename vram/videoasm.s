@@ -37,6 +37,7 @@ cls:	pushl	%ebp
 	    # Fill me in!
 
         movl $(SCREENBYTES/4), %ecx
+        decl %ecx
         movl $video, %edx           # need $ sign to read address of video
         .equ HALF, (DEFAULT_ATTR<<8) | SPACE
         .equ FULL, (HALF<<16) | HALF
