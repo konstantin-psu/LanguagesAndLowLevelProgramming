@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
     //     }
     // }
     // display();
+    cls();
     display();
     return 0;
 }

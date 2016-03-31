@@ -7,8 +7,8 @@ int main(int argc, char** argv) {
     video[2][38][1] = 0x51; video[2][40][1] = 0x43; video[2][42][1] = 0x35;
 
     setAttr(7);
-    outc('A');
-    outc('A');
+    outc('B');
+//    outc('A');
 
     display();
     return 0;

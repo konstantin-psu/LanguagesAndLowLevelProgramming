@@ -37,56 +37,74 @@ cls:	pushl	%ebp
 	    # Fill me in!
 
         movl $(SCREENBYTES/4), %ecx
+        decl %ecx
         movl $video, %edx           # need $ sign to read address of video
-        .equ HALF, (DEFAULT_ATTR<<8) | SPACE
-        .equ FULL, (HALF<<16) | HALF
+        .equ HALF, (DEFAULT_ATTR<<8) | SPACE  # third byte color, fourth byte space
+        .equ FULL, (HALF<<16) | HALF # first and third byte color, second and fourth byte spaces
 
-1:      
-        movl $FULL, (%edx)
+1:      movl $FULL, (%edx)
         addl $4, %edx
         decl %ecx
         jnz 1b 
 
 
 
-	movl	%ebp, %esp
-	popl	%ebp
-	ret
+        movl	%ebp, %esp
+        popl	%ebp
+        ret
 
 	# Set the video attribute for characters output using outc.
 	.globl	setAttr
 setAttr:pushl	%ebp
-	movl	%esp, %ebp
-	# Fill me in!
-	movl	%ebp, %esp
-	popl	%ebp
-	ret
+        movl	%esp, %ebp
+        # Fill me in!
+        movl	%ebp, %esp
+        popl	%ebp
+        ret
 
-	# Output a single character at the current row and col position
-	# on screen, advancing the cursor coordinates and scrolling the
-	# screen as appropriate.  Special treatment is provided for
-        # NEWLINE characters, moving the "cursor" to the start of the
-	# "next line".
-	.globl	outc
+        # Output a single character at the current row and col position
+        # on screen, advancing the cursor coordinates and scrolling the
+        # screen as appropriate.  Special treatment is provided for
+            # NEWLINE characters, moving the "cursor" to the start of the
+        # "next line".
+        .globl	outc
 outc:	pushl	%ebp
-	movl	%esp, %ebp
-	# Fill me in!
+        movl	%esp, %ebp
+        # Fill me in!
 
-    movl $video, %edx           # need $ sign to read address of video
-    movb 8(%ebp), %ah
-    movb %ah, video
+        movl $((SCREENBYTES-ROWBYTES)/4), %ecx
+
+        movl $video, %edx           # need $ sign to read address of video
+
+        movb 8(%ebp), %al
+        movb %al, video
+
+        sub %al, $'\n'
+
+        jmp exitC
     
+1:      movl ROWBYTES(%edx), %esi
+        movl %esi, (%edx)
+        addl $4, %edx
+        decl %ecx
+        jnz 1b 
 
-	movl	%ebp, %esp
-	popl	%ebp
-	ret
+        movl    $(ROWBYTES/4), %ecx
+2:      movl $FULL, (%edx)
+        addl $4, %edx
+        decl %ecx
+        jnz 2b 
 
-	# Output an unsigned numeric value as a sequence of 8 hex digits.
-	.globl	outhex
+exitC:
+        movl	%ebp, %esp
+        popl	%ebp
+        ret
+        # Output an unsigned numeric value as a sequence of 8 hex digits.
+        .globl	outhex
 outhex:	pushl	%ebp
-	movl	%esp, %ebp
-	# Fill me in!
-	movl	%ebp, %esp
-	popl	%ebp
-	ret
+        movl	%esp, %ebp
+        # Fill me in!
+        movl	%ebp, %esp
+        popl	%ebp
+        ret
 
