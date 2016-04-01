@@ -6,10 +6,11 @@
 	.equ	ROWBYTES,	COLS*CHARBYTES	# total #bytes per row
 	.equ	SCREENBYTES,	ROWS*ROWBYTES	# total #bytes per screen
 
-	.equ	SPACE,		32		# blank space
+	.equ	SPACE,		0x20		# blank space
 	.equ	NEWLINE,	'\n'		# newline character
 
 	.equ	DEFAULT_ATTR, 	0x2e		# PSU Green
+	.equ	DEFAULT_ATTR2, 	0x5e		# PSU Green
 
 	.data
 
@@ -75,25 +76,42 @@ outc:	pushl	%ebp
         movl $((SCREENBYTES-ROWBYTES)/4), %ecx
 
         movl $video, %edx           # need $ sign to read address of video
+        xorl %eax, %eax
 
+
+        orl (%edx), %eax
         movb 8(%ebp), %al
-        movb %al, video
 
-        sub %al, $'\n'
+        cmpb $NEWLINE, %al
+        je copyAll
+        # .equ HALF2, (DEFAULT_ATTR2<<8) | %al  # third byte color, fourth byte space
+
+        # orw DEFAULT_ATTR2, %ah
+
+        addl col, %edx
+        movb %al, (%edx)
+        incl col
+        incl col
 
         jmp exitC
+        # incl col
+        # cmpl col, $COLS
+        # movl $col, video
+
     
-1:      movl ROWBYTES(%edx), %esi
+copyAll:      movl ROWBYTES(%edx), %esi
         movl %esi, (%edx)
         addl $4, %edx
         decl %ecx
-        jnz 1b 
+        jnz copyAll
 
         movl    $(ROWBYTES/4), %ecx
 2:      movl $FULL, (%edx)
         addl $4, %edx
         decl %ecx
         jnz 2b 
+        
+        subl $COLS, col
 
 exitC:
         movl	%ebp, %esp
