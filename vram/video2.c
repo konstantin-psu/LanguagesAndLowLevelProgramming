@@ -1,4 +1,5 @@
 #include "video.h"
+#include "unistd.h"
 
 int main(int argc, char** argv) {
     int i, j;
@@ -8,18 +9,31 @@ int main(int argc, char** argv) {
 
     setAttr(7);
     
-    for (i = 0; i < 1000; i++) {
+    for (i = 0; i < 85; i++) {
         outc('A');
     }
     outc('\n');
+    outc('A');
+    outc('A');
     outc('\n');
-    outc('\n');
+    outc('A');
+    outc('A');
+    outc('A');
+    //outc('\n');
+    //outc('\n');
 
-    for (i = 0; i < 100; i++) {
+    for (i = 0; i < 21; i++) {
+        outc('\n');
         outc('A');
     }
-
+    outc('A');
+    outc('\n');
+    outc('A');
+    outc('A');
+    outc('A');
+    outc('A');
     display();
+
     return 0;
 }
 
