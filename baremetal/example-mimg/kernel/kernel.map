@@ -1,0 +1,96 @@
+Archive member included to satisfy reference by file (symbol)
+
+../../simpleio/libio.a(simpleio.o)
+                              kernel.o (cls)
+../../simpleio/libio.a(serial.o)
+                              ../../simpleio/libio.a(simpleio.o) (serial_putc)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x0000000000100000                . = 0x100000
+
+.text           0x0000000000100000     0x1634
+                0x0000000000100000                _text_start = .
+ *(.multiboot)
+ *(.text)
+ .text          0x0000000000100000        0xe init.o
+                0x0000000000100000                entry
+ .text          0x000000000010000e      0x103 kernel.o
+                0x000000000010000e                kernel
+ *fill*         0x0000000000100111        0xf 
+ .text          0x0000000000100120      0x471 ../../simpleio/libio.a(simpleio.o)
+                0x00000000001001c4                setVideo
+                0x00000000001001ce                setWindow
+                0x000000000010021c                setAttr
+                0x0000000000100226                cls
+                0x00000000001002a9                putchar
+                0x00000000001003d9                puts
+                0x0000000000100402                printf
+ .text          0x0000000000100591       0x2b ../../simpleio/libio.a(serial.o)
+                0x0000000000100591                serial_putc
+                0x00000000001005bc                _text_end = .
+ *(.rodata)
+ .rodata        0x00000000001005bc       0x58 ../../simpleio/libio.a(simpleio.o)
+ *(.data)
+ .data          0x0000000000100614     0x1000 init.o
+ .data          0x0000000000101614        0x0 kernel.o
+ .data          0x0000000000101614       0x10 ../../simpleio/libio.a(simpleio.o)
+ .data          0x0000000000101624        0x0 ../../simpleio/libio.a(serial.o)
+                0x0000000000101624                _start_bss = .
+ *(COMMON)
+ *(.bss)
+ .bss           0x0000000000101624        0x0 init.o
+ .bss           0x0000000000101624        0x0 kernel.o
+ .bss           0x0000000000101624       0x10 ../../simpleio/libio.a(simpleio.o)
+ .bss           0x0000000000101634        0x0 ../../simpleio/libio.a(serial.o)
+                0x0000000000101634                _end_bss = .
+
+.iplt           0x0000000000101640        0x0
+ .iplt          0x0000000000000000        0x0 init.o
+
+.igot.plt       0x0000000000101634        0x0
+ .igot.plt      0x0000000000000000        0x0 init.o
+
+.rel.dyn        0x0000000000101634        0x0
+ .rel.iplt      0x0000000000000000        0x0 init.o
+ .rel.text      0x0000000000000000        0x0 init.o
+
+.rodata.str1.1  0x0000000000101634       0x7e
+ .rodata.str1.1
+                0x0000000000101634       0x77 kernel.o
+ .rodata.str1.1
+                0x00000000001016ab        0x7 ../../simpleio/libio.a(simpleio.o)
+
+.rodata.str1.4  0x00000000001016b4       0x48
+ .rodata.str1.4
+                0x00000000001016b4       0x48 kernel.o
+                                         0x47 (size before relaxing)
+
+.eh_frame       0x00000000001016fc      0x1a8
+ .eh_frame      0x00000000001016fc       0x54 kernel.o
+ .eh_frame      0x0000000000101750      0x154 ../../simpleio/libio.a(simpleio.o)
+                                        0x16c (size before relaxing)
+
+.init
+ *(.initdata)
+LOAD init.o
+LOAD kernel.o
+LOAD ../../simpleio/libio.a
+OUTPUT(kernel elf32-i386)
+
+.comment        0x0000000000000000       0x2b
+ .comment       0x0000000000000000       0x2b kernel.o
+                                         0x2c (size before relaxing)
+ .comment       0x0000000000000000       0x2c ../../simpleio/libio.a(simpleio.o)
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 ../../simpleio/libio.a(simpleio.o)

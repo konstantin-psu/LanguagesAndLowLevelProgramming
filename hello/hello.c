@@ -16,7 +16,7 @@ typedef unsigned char single[2];
 typedef single        row[COLUMNS];
 typedef row           screen[LINES];
 
-static screen* video = (screen*)VIDEO;
+extern screen* video = (screen*)VIDEO;
 
 /*-------------------------------------------------------------------------
  * Cursor coordinates:
@@ -27,17 +27,17 @@ static int ypos = 0;
 /*-------------------------------------------------------------------------
  * Clear the screen.
  */
-void cls(void) {
-    int i, j;
-    for (i=0; i<LINES; ++i) {
-      for (j=0; j<COLUMNS; ++j) {
-        (*video)[i][j][0] = ' ';
-        (*video)[i][j][1] = ATTRIBUTE+j+i;
-      }
-    }
-    ypos = 0;
-    xpos = 0;
-}
+//void cls(void) {
+//    int i, j;
+//    for (i=0; i<LINES; ++i) {
+//      for (j=0; j<COLUMNS; ++j) {
+//        (*video)[i][j][0] = ' ';
+//        (*video)[i][j][1] = ATTRIBUTE+j+i;
+//      }
+//    }
+//    ypos = 0;
+//    xpos = 0;
+//}
 
 /*-------------------------------------------------------------------------
  * Output a single character.

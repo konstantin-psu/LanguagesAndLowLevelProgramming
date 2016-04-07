@@ -1,0 +1,36 @@
+GAS LISTING init.s 			page 1
+
+
+   1              	#-----------------------------------------------------------------------------
+   2              	# init.s:  Simple kernel initialization code
+   3              	#
+   4              	# Mark P. Jones, March 2006, 2016
+   5              	
+   6              	        .text
+   7              	        .globl	entry
+   8 0000 8D250010 	entry:	leal    stack, %esp             # Set up initial kernel stack
+   8      0000
+   9 0006 E8FCFFFF 	        call    kernel
+   9      FF
+  10 000b F4       	1:      hlt                             # Halt CPU if kernel returns
+  11 000c EBFD     	        jmp     1b
+  12              	
+  13              	        .data                           # Make space for a simple stack
+  14              		.align	4
+  15 0000 00000000 	        .space  4096
+  15      00000000 
+  15      00000000 
+  15      00000000 
+  15      00000000 
+  16              	stack:
+  17              	
+  18              	#-- Done ---------------------------------------------------------------------
+GAS LISTING init.s 			page 2
+
+
+DEFINED SYMBOLS
+              init.s:8      .text:0000000000000000 entry
+              init.s:16     .data:0000000000001000 stack
+
+UNDEFINED SYMBOLS
+kernel
