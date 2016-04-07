@@ -18,7 +18,7 @@
         # Reserve space for a video ram frame buffer with
         # 25 rows; 80 columns; and one code and one attribute
         # byte per character.
-	.globl  video
+	# .globl  video
 	.align	4
 #video:	.space	SCREENBYTES
 
@@ -38,8 +38,11 @@ cls:	pushl	%ebp
 	    movl	%esp, %ebp
 	    # Fill me in!
 
+        pushl %ecx
+        pushl %edx
+
         movl $(SCREENBYTES/4), %ecx
-        movl $video, %edx           # need $ sign to read address of video
+        movl video, %edx           # need $ sign to read address of video
         .equ HALF, (DEFAULT_ATTR<<8) | SPACE  # third byte color, fourth byte space
         .equ FULL, (HALF<<16) | HALF # first and third byte color, second and fourth byte spaces
 
@@ -48,7 +51,8 @@ cls:	pushl	%ebp
         decl %ecx
         jnz 1b 
 
-
+        popl %edx
+        popl %ecx
 
         movl	%ebp, %esp
         popl	%ebp
@@ -76,9 +80,15 @@ setAttr:pushl	%ebp
 outc:	pushl	%ebp
         movl	%esp, %ebp
 
+        pushl %ecx
+        pushl %edx
+        pushl %eax
+        pushl %ebx
+        pushl %esi
+
         movl $((SCREENBYTES-ROWBYTES)/4), %ecx # number of bytes left
 
-        movl $video, %edx           # need $ sign to read address of video
+        movl video, %edx           # need $ sign to read address of video
 
         movl attr, %eax
         shll  $8, %eax
@@ -137,6 +147,13 @@ copyAll:
 # Copy subroutine END
 
 exitC:
+
+        popl %esi
+        popl %ebx
+        popl %eax
+        popl %edx
+        popl %ecx
+
         movl	%ebp, %esp
         popl	%ebp
         ret

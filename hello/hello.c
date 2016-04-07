@@ -12,6 +12,8 @@
 #define ATTRIBUTE       12
 #define VIDEO           0xB8000
 
+#include "hello.h"
+
 typedef unsigned char single[2];
 typedef single        row[COLUMNS];
 typedef row           screen[LINES];
@@ -42,39 +44,48 @@ static int ypos = 0;
 /*-------------------------------------------------------------------------
  * Output a single character.
  */
-void putchar(char c) {
-    int i, j;
-
-    if (c!='\n' && c!='\r') {
-        (*video)[ypos][xpos][0] = c & 0xFF;
-        (*video)[ypos][xpos][1] = ATTRIBUTE;
-        if (++xpos < COLUMNS) {
-            return;
-        }
-    }
-
-    xpos = 0;               // Perform a newline
-    if (++ypos >= LINES) {  // scroll up top lines of screen ... 
-        ypos = LINES-1;
-        for (i=0; i<ypos; ++i) {
-          for (j=0; j<COLUMNS; ++j) {
-            (*video)[i][j][0] = (*video)[i+1][j][0];
-            (*video)[i][j][1] = (*video)[i+1][j][1];
-          }
-        }
-        for (j=0; j<COLUMNS; ++j) { // fill in new blank line
-          (*video)[ypos][j][0] = ' ';
-          (*video)[ypos][j][1] = ATTRIBUTE;
-        }
-    }
-}
+//void putchar(char c) {
+//    int i, j;
+//
+//    if (c!='\n' && c!='\r') {
+//        (*video)[ypos][xpos][0] = c & 0xFF;
+//        (*video)[ypos][xpos][1] = ATTRIBUTE;
+//        if (++xpos < COLUMNS) {
+//            return;
+//        }
+//    }
+//
+//    xpos = 0;               // Perform a newline
+//    if (++ypos >= LINES) {  // scroll up top lines of screen ... 
+//        ypos = LINES-1;
+//        for (i=0; i<ypos; ++i) {
+//          for (j=0; j<COLUMNS; ++j) {
+//            (*video)[i][j][0] = (*video)[i+1][j][0];
+//            (*video)[i][j][1] = (*video)[i+1][j][1];
+//          }
+//        }
+//        for (j=0; j<COLUMNS; ++j) { // fill in new blank line
+//          (*video)[ypos][j][0] = ' ';
+//          (*video)[ypos][j][1] = ATTRIBUTE;
+//        }
+//    }
+//}
 
 /*-------------------------------------------------------------------------
  * Output a zero-terminated string.
  */
 void puts(char *msg) {
+  long i = 0, j = 0;
+  char out;
   while (*msg) {
-    putchar(*msg++);
+    for (j = 0; j < 1; j++) {
+        i = 0;
+        while (i < 1000000) {i++;}
+    }
+    j = 0;
+    out = *msg;
+    msg++;
+    outc(out);
   }
 }
 
@@ -84,8 +95,16 @@ void puts(char *msg) {
 void hello() {
   int i;
   cls();
+  setAttr('0x2e');
+    outc('A');
+    outc('A');
+    outc('A');
+    outc('A');
+    outc('\n');
+    outc('A');
   for (i=0; i<2; i++) {
-    puts("hhhh   hhhh\n");
+  //puts("AAAAAAAAAA");
+  puts("hhhh   hhhh\n");
     puts(" hh    hhh        lll lll\n");
     puts(" hh    hh   eeee  ll  ll   oooo\n");
     puts(" hhhhhhhh  ee  ee ll  ll  oo  oo\n");

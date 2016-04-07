@@ -33,18 +33,21 @@ cdrom: grub.cfg hello
 	cp hello cdrom
 	touch cdrom
 
-OBJS   = boot.o hello.o videoasm.o
+OBJS   = boot.o hello.o
 # OBJS   = boot.o hello.o
 
 hello: ${OBJS} hello.ld
-	$(LD) -T hello.ld -o hello ${OBJS} --print-map > hello.map 
+	$(LD) -T hello.ld -o hello ${OBJS} videoasm.o --print-map > hello.map 
 	strip hello
 
 boot.o: boot.s
 	$(CC) -Wa,-alsm=boot.lst -c -o boot.o boot.s
 
-hello.o: hello.c
-	$(CC) ${CCOPTS} -c -o hello.o -c hello.c
+hello.o: hello.c videoasm.o
+	$(CC) ${CCOPTS} -c -o hello.o -c hello.c videoasm.o
+
+hello.s: hello.c videoasm.o
+	$(CC) ${CCOPTS} -S -o hello.s -c hello.c
 
 videoasm.o:	videoasm.s
 	gcc -m32 -c -Wa,-alsnm=videoasm.lst videoasm.s
