@@ -9,6 +9,8 @@
 
 	.equ	SPACE,		0x20		# blank space
 	.equ	NEWLINE,	'\n'		# newline character
+	.equ	NEWLINEFEED, 0x0D		# newline character
+	.equ	BACKSPACE,	 0x7F		# newline character
 
 	.equ	DEFAULT_ATTR, 	0x2e		# PSU Green
 	.equ	DEFAULT_ATTR2, 	0x5e		# PSU Green
@@ -25,7 +27,9 @@
         # Some variables to hold the current row, column, and
 	# video attribute:
 	.align	4
+.globl row
 row:	.long	0		# we will only use the least significant
+.globl col
 col:	.long	0		# bytes of these variables
 attr:	.long	0
 
@@ -82,11 +86,11 @@ setAttr:pushl	%ebp
 outc:	pushl	%ebp
         movl	%esp, %ebp
 
-        pushl %ecx
-        pushl %edx
-        pushl %eax
-        pushl %ebx
-        pushl %esi
+        pushl %ecx  # Save all used registers  
+        pushl %edx  # Save all used registers
+        pushl %eax  # Save all used registers
+        pushl %ebx  # Save all used registers
+        pushl %esi  # Save all used registers
 
         movl $((SCREENBYTES-ROWBYTES)/4), %ecx # number of bytes left
 
@@ -97,9 +101,9 @@ outc:	pushl	%ebp
         movb 8(%ebp), %al  # save the argument to %al char = 1 Byte
 
         cmpb $NEWLINE, %al  # Test if new line
-
         je newLine
 
+calculateOffset:
         movl row, %ebx
         imull $ROWBYTES, %ebx
         addl col, %ebx
@@ -129,7 +133,7 @@ setBack:
         movl $0, col
         decl row
         jmp copyAll
-        
+
     
 # Copy subroutine START
 copyAll:

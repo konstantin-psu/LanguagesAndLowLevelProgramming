@@ -23,53 +23,9 @@ extern screen* video = (screen*)VIDEO;
 /*-------------------------------------------------------------------------
  * Cursor coordinates:
  */
-static int xpos = 0;
-static int ypos = 0;
+// static int xpos = 0;
+// static int ypos = 0;
 
-/*-------------------------------------------------------------------------
- * Clear the screen.
- */
-//void cls(void) {
-//    int i, j;
-//    for (i=0; i<LINES; ++i) {
-//      for (j=0; j<COLUMNS; ++j) {
-//        (*video)[i][j][0] = ' ';
-//        (*video)[i][j][1] = ATTRIBUTE+j+i;
-//      }
-//    }
-//    ypos = 0;
-//    xpos = 0;
-//}
-
-/*-------------------------------------------------------------------------
- * Output a single character.
- */
-//void putchar(char c) {
-//    int i, j;
-//
-//    if (c!='\n' && c!='\r') {
-//        (*video)[ypos][xpos][0] = c & 0xFF;
-//        (*video)[ypos][xpos][1] = ATTRIBUTE;
-//        if (++xpos < COLUMNS) {
-//            return;
-//        }
-//    }
-//
-//    xpos = 0;               // Perform a newline
-//    if (++ypos >= LINES) {  // scroll up top lines of screen ... 
-//        ypos = LINES-1;
-//        for (i=0; i<ypos; ++i) {
-//          for (j=0; j<COLUMNS; ++j) {
-//            (*video)[i][j][0] = (*video)[i+1][j][0];
-//            (*video)[i][j][1] = (*video)[i+1][j][1];
-//          }
-//        }
-//        for (j=0; j<COLUMNS; ++j) { // fill in new blank line
-//          (*video)[ypos][j][0] = ' ';
-//          (*video)[ypos][j][1] = ATTRIBUTE;
-//        }
-//    }
-//}
 
 /*-------------------------------------------------------------------------
  * Output a zero-terminated string.
@@ -95,15 +51,10 @@ void puts(char *msg) {
 void hello() {
   int i;
   cls();
-  setAttr('0x2e');
-    outc('A');
-    outc('A');
-    outc('A');
-    outc('A');
-    outc('\n');
-    outc('A');
-  for (i=0; i<2; i++) {
-  //puts("AAAAAAAAAA");
+  setAttr((10&7)<<4);
+  bootinfo();
+  //puts("bootinfo is running!\n");
+  for (i=0; i<1; i++) {
   puts("hhhh   hhhh\n");
     puts(" hh    hhh        lll lll\n");
     puts(" hh    hh   eeee  ll  ll   oooo\n");
