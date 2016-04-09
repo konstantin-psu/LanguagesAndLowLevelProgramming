@@ -155,30 +155,42 @@
 \pagebreak
 
 %\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
-\textbf{Attempted Topics: }\\
-1. Write simple programs that can run in a bare-metal environment using low-level programming languages.\\
-2. Discuss common challenges in low-level systems software development, including debugging in a bare metal environment.\\
+\textbf{Attempted Topic: }\\
+Write simple programs that can run in a bare-metal environment using low-level programming languages.\\
 
-Narrative 1. \\
+Narrative\\
 
-I attempted to write simple "editor" that allows to enter and delete text (unfortunately without navigation keys). 
-I also reused all the functions we written for the first lab (setAttr, cls, outc, outhex), by adding videoasm to
-the hello.
 
-Input is easily by reusing provided "simpleio" library, 
+At first I attempted to write simple "editor" that allows to enter and delete text (unfortunately without navigation keys). 
+As text entered it appears on the screen, only printable characters can be printed. Enter will create new line, and backspace delete previous letter.\\
+
+The "editor" has two major problems, I am going to attempt to solve in the future. First and easy, Backspace stops working after scrolling, since array that keeps track of the
+maximum number of characters per line doesn't get updated. Second, there is no scroll back, i.e. history is simply erased during scrolling. This problem can be aided
+at some degree by creating fixed text buffer, however, a better solution would be to enable HEAP memory allocation (maybe this is too ambiguous, I am hoping this will covered
+by one of the future lecture topics).\\
+
+Main functionality lives in hello.c (shell() function). After trying "editor", simplistic emulation of a terminal was created: as text typed it saved to a buffer (100 symbols long)
+after return "expression" evaluated and corresponding method is called. Available options are displayed at the time "terminal" is created.
+
+I reused all the functions we written for the first lab (setAttr, cls, outc, outhex), by adding videoasm as a dependency to hello, and making "video, row, col"
+global variables.
+
+Input is done by reusing provided getc function from "simpleio" library. \\
+
+In conclusion: overall it was a great introduction exercise, with fair amount of assembly, and low level programming.
 
 \vspace{0.5cm}
 
-Narrative 2. \\
-
-Debugging bare metal programs is not an easy task. Lack of simple tools like logger, printing facilities and the most important debugger,
-make the task non-trivial. There is no way to easily go through program logic, inspect memory and variables values to see what goes wrong.
-
-There are several approaches that attempt to solve this problem.\\
-1. To run bare metal application within instrumented virtual machine that emulate desired computer architecture
-, and provide similar functionality as a debugger.
-
-BIOS for example solves this problem by introducing
+% Narrative 2. \\
+% 
+% Debugging bare metal programs is not an easy task. Lack of simple tools like logger, printing facilities and the most important debugger,
+% make the task non-trivial. There is no way to easily go through program logic, inspect memory and variables values to see what goes wrong.
+% 
+% There are several approaches that attempt to solve this problem.\\
+% 1. To run bare metal application within instrumented virtual machine that emulate desired computer architecture
+% , and provide similar functionality as a debugger.
+% 
+% BIOS for example solves this problem by introducing
 
 
 \end{document}

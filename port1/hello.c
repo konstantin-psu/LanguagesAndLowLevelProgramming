@@ -11,6 +11,7 @@
 #define LINES           25
 #define ATTRIBUTE       12
 #define VIDEO           0xB8000
+#define BUFMAX          100
 
 #include "hello.h"
 #include "simpleio.h"
@@ -22,10 +23,26 @@ typedef row1           screen[LINES];
 extern screen* video = (screen*)VIDEO;
 
 int rowCache[25];
+char buffer[BUFMAX];
+int bufferPosition;
+
+void resetBuffer() {
+  int i;
+  bufferPosition = 0;
+  for (i = 0; i < BUFMAX; i++) {
+    buffer[i] = 0;
+  }
+}
+
+void add(char a) {
+    if (bufferPosition >= BUFMAX) {
+        resetBuffer();
+    }
+    buffer[bufferPosition++] = a;
+}
 /*-------------------------------------------------------------------------
  * Cursor coordinates:
  */
-
 
 /*-------------------------------------------------------------------------
  * Output a zero-terminated string.
@@ -45,6 +62,16 @@ void putstring(char *msg) {
   }
 }
 
+int eq(char * a, char *b) {
+    while(*a) {
+        if (*a != *b) return 0;
+        a++;
+        b++;
+    }
+
+    if (*b != 0) return 0;
+    return 1;
+}
 
 void testCoordinates() {
         if (col == 0) {     
@@ -60,6 +87,17 @@ void testCoordinates() {
         }
 }
 
+void help() {
+     cls();
+     printf("welcome to SHELL v. 0.00001\n");
+     printf("Available options: \n");
+     printf("magic\n");
+     printf("bootinfo\n");
+     printf("clear\n");
+     printf("help\n");
+     printf("To execute: type one of the above options and hit return\n");
+}
+
 
 // Intention was to implement simple shell to output multiboot information
 // I left it as an exercise for the future when I figure out how to implement
@@ -72,9 +110,23 @@ void shell() {
       b = (char)k;         // Convert to char
       if (b == 0xD) {      // Test if new line
         outc('\n');        // Output new line
+        add(0);
+        if (eq("magic",buffer)) {
+            outc('\n');
+            magic();
+        } else if (eq("bootinfo", buffer)) {
+            outc('\n');
+            bootinfo();
+        } else if (eq("clear", buffer)) {
+            cls();
+        } else if (eq("help", buffer)) {
+            help();
+        }
         rowCache[row] = 0; // reset char counter
+        resetBuffer();
       }
       else if (b > 0x1F && b < 0x7F) {  // test if printable char
+        add(b);
         rowCache[row]+=2; // Output and increase count
         outc(b);
       } else if (b == 0x7F) {
@@ -88,17 +140,19 @@ void shell() {
     }
 }
 
+
 /*-------------------------------------------------------------------------
  * Main program:
  */
 void hello() {
   int i;
+  resetBuffer();
   for (i = 0; i < 25; i++) {
     rowCache[i] = 0;
   }
   cls();
   setAttr(0x2e); // Set attribute to default value (PSU Green)
-  outhex(0x5e);
+  help();
   shell();
 }
 

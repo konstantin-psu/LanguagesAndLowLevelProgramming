@@ -1,0 +1,7 @@
+cdrom
+cdrom.iso
+hello 
+*.o
+*.lst
+*.map
+*.aux

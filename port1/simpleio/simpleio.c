@@ -111,7 +111,7 @@ void puts(char *msg) {
  * is printed in hex; if base == 'd', then the string is printed as a
  * signed integer; otherwise an unsigned integer is assumed.
  */
-static void itoa(char* buf, int base, long d) {
+void itoa(char* buf, int base, long d) {
     char* p  = buf;
     char* p1;
     char* p2;
@@ -156,7 +156,7 @@ void printf(const char *format, ...) {
     arg++;
     while ((c = *format++) != 0) {
         if (c != '%') {
-            putchar(c);
+            outc(c);
         } else {
             char* p;
             int padChar  = ' ';
@@ -194,15 +194,15 @@ void printf(const char *format, ...) {
                       padWidth--;
                     }
                     while (0<padWidth--) {
-                        putchar(padChar);
+                        outc(padChar);
                     }
                     for (p = buf; *p; p++) {
-                        putchar(*p);
+                        outc(*p);
                     }
                     break;
 
 		case 'c' :
-		    putchar(*((char*) arg++));
+		    outc(*((char*) arg++));
 		    break;
 
                 case 's' :
@@ -211,12 +211,12 @@ void printf(const char *format, ...) {
                         p = "(null)";
                     }
                     while (*p) {
-                        putchar(*p++);
+                        outc(*p++);
                     }
                     break;
 
                 default :
-                    putchar(*((int *) arg++));
+                    outc(*((int *) arg++));
                     break;
             }
         }

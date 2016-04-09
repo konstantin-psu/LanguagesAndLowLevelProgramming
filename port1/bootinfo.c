@@ -50,10 +50,21 @@ struct MultibootMMap {
 /*-------------------------------------------------------------------------
  * Main program:
  */
+void magic() {
+  printf("mbi_magic : 0x%x\n", mbi_magic);
+}
+void mbiinf() {
+  printf("mbi       : 0x%x\n", mbi);
+  printf("->flags   : 0x%x\n", mbi->flags);
+  printf("MEM_VALID : 0x%x\n", (mbi->flags)&MBI_MEM_VALID);
+  printf("CMD_VALID : 0x%x\n", (mbi->flags)&MBI_CMD_VALID);
+  printf("MODS_VALID: 0x%x\n", (mbi->flags)&MBI_MODS_VALID);
+  printf("MMAP_VALID: 0x%x\n", (mbi->flags)&MBI_MMAP_VALID);
+  printf("->memLower: %d\n", mbi->memLower);
+  printf("->memUpper: %d\n", mbi->memUpper);
+}
 void bootinfo() {
-  //cls();
-  puts("bootinfo is running!\n");
-  //puts("mbi_magic : 0x"); outc(mbi_magic); outc('\n');
+  cls();
   printf("mbi_magic : 0x%x\n", mbi_magic);
   printf("mbi       : 0x%x\n", mbi);
   printf("->flags   : 0x%x\n", mbi->flags);

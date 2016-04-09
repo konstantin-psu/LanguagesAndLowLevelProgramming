@@ -56,6 +56,10 @@ cls:	pushl	%ebp
         decl %ecx
         jnz 1b 
 
+        xorl %ecx, %ecx
+        movl %ecx, row
+        movl %ecx, col
+
         # restore saved registers
         popl %edx
         popl %ecx

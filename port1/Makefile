@@ -61,6 +61,6 @@ libs:
 #----------------------------------------------------------------------------
 # tidy up after ourselves ...
 clean:
-	-rm -rf cdrom cdrom.iso hello *.o *.lst *.map && make clean -C simpleio
+	-rm -rf cdrom cdrom.iso hello *.o *.lst *.map *.log *.aux  && make clean -C simpleio
 
 #----------------------------------------------------------------------------

@@ -7,4 +7,5 @@ extern void setWindow(int t, int h, int l, int w);
 extern void putchar(int c);
 extern void puts(char *msg);
 extern void printf(const char *format, ...);
+extern void itoa(char* buf, int base, long d);
 #endif
