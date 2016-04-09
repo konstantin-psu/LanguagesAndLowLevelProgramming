@@ -36,13 +36,14 @@ attr:	.long	0
 	.text
 
 	# Clear the screen, setting all characters to SPACE
-        # using the DEFAULT_ATTR attribute.
+    # using the DEFAULT_ATTR attribute.
+    # Mostly copied from class example
 	.globl	cls
 cls:	pushl	%ebp
 	    movl	%esp, %ebp
-	    # Fill me in!
 
-        pushl %ecx
+        # save registers
+        pushl %ecx 
         pushl %edx
 
         movl $(SCREENBYTES/4), %ecx
@@ -55,6 +56,7 @@ cls:	pushl	%ebp
         decl %ecx
         jnz 1b 
 
+        # restore saved registers
         popl %edx
         popl %ecx
 
@@ -66,12 +68,13 @@ cls:	pushl	%ebp
 	.globl	setAttr
 setAttr:pushl	%ebp
         movl	%esp, %ebp
-        # Fill me in!
 
+        # save edx
         pushl %edx
-        movl 8(%ebp), %edx  # save the argument to %al char = 1 Byte
-        movl %edx, attr  # save the argument to %al char = 1 Byte
+        movl 8(%ebp), %edx  # copy argument to %edx
+        movl %edx, attr  #  set attr variable
 
+        # restore edx end exit
         popl %edx
         movl	%ebp, %esp
         popl	%ebp
@@ -94,44 +97,43 @@ outc:	pushl	%ebp
 
         movl $((SCREENBYTES-ROWBYTES)/4), %ecx # number of bytes left
 
-        movl video, %edx           # need $ sign to read address of video
+        movl video, %edx   # no need "$" like in vram, since using pointers 
 
-        movl attr, %eax
-        shll  $8, %eax
-        movb 8(%ebp), %al  # save the argument to %al char = 1 Byte
+        movl attr, %eax  #copy attr to %eax
 
-        cmpb $NEWLINE, %al  # Test if new line
-        je newLine
+        movb 8(%ebp), %ah  # save char to ah
+
+        cmpb $NEWLINE, %ah  # Test if new line
+        je newLine         # do something about it
 
 calculateOffset:
+        # should have done it with leal
         movl row, %ebx
         imull $ROWBYTES, %ebx
-        addl col, %ebx
+        addl col, %ebx  # no ebx contains correct offset
         addl %ebx, %edx
-        movb %al, (%edx)
-        movb %ah, 1(%edx)
-        incl col
+        movb %ah, (%edx)  # output letter
+        movb %al, 1(%edx) # output attr
+        incl col          # increase col by 2 since we are using it to calculate per-byte offset
         incl col
 
-        jmp newLineTest
-
-newLineTest:
-        cmpl $COLS2, col
-        jl exitC
+        
+newLineTest: # test if now out of boundaries, if so go to next line
+        cmpl $COLS2, col 
+        jl exitC # so far so good, exit
         
 newLine: 
-        incl row
-        movl $0, col
+        incl row # go plus one row
+        movl $0, col # reset col
 
 test:
-        cmpl $ROWS, row
-        je setBack
-        jmp exitC
+        cmpl $ROWS, row  # check if spilled out
+        je setBack       # if yes scroll one line
+        jmp exitC        # all good just exit
         
 
 setBack:
-        movl $0, col
-        decl row
+        decl row        
         jmp copyAll
 
     
@@ -145,7 +147,7 @@ copyAll:
 
         movl    $(ROWBYTES/4), %ecx #reset last line to empty
 
-2:      movl $FULL, (%edx)         # Green Space
+2:      movl $FULL, (%edx)         # Default attribute
         addl $4, %edx
         decl %ecx
         jnz 2b 
@@ -154,6 +156,7 @@ copyAll:
 
 exitC:
 
+        # restore all saved registers
         popl %esi
         popl %ebx
         popl %eax
@@ -163,26 +166,42 @@ exitC:
         movl	%ebp, %esp
         popl	%ebp
         ret
+
+
+
         # Output an unsigned numeric value as a sequence of 8 hex digits.
         .globl	outhex
 
-
+        # Quite useful for baremetal debugging
 outhex:	pushl	%ebp
         movl	%esp, %ebp
         
-        movl 8(%ebp), %edx
-        movl $8, %ecx
+        # save all used registers
+        pushl %edx
+        pushl %ecx
+        pushl %eax
+
+        movl 8(%ebp), %edx # copy argument to edx
+        movl $8, %ecx      # use %ecx as a counter to iterate over 8 bytes
 
 loopOut:
-        xorl %eax, %eax
-        movb %dl, %al
+        xorl %eax, %eax   # reset eax
+        movb %dl, %al     # move first byte of the numeric value to al
+
+        # this is done to leave only first half byte in eax
         shll $28, %eax
         shrl $28, %eax
-        cmpl $0xA, %eax
-        jl printNumber
+
+        cmpl $0xA, %eax  # test if byte greater than 0xA
+        jl printNumber   # if not then output numeric value
        
-        addl $55, %eax
-        pushl %eax
+        addl $55, %eax   # else add 55 to output ASCII letter
+
+        # Save final value to the stack
+        # This is needed to account for the little endian problem
+        # If print out right away bytes will be in reverse order
+        pushl %eax      
+
         jmp testEndOutLoop
 
 printNumber:
@@ -190,23 +209,27 @@ printNumber:
         pushl %eax
 
 testEndOutLoop:
-        decl %ecx
+        decl %ecx  # if 0 - all good, exit
         jz exitOut
-        shrl $4, %edx
+        shrl $4, %edx # else set dl to the next half bit
         jmp loopOut
 
 exitOut:
-        movl $8, %ecx
+        movl $8, %ecx # now need to output all saved numeric values
 1:      
-        popl %eax
-        pushl %ecx
-        pushl %eax
+        popl %eax  # get the value to output
+        pushl %ecx # save counter
+        pushl %eax # put value back on the stack to pass as an argument to outc
         call outc
-        popl %eax
-        popl %ecx
+        popl %eax  # remove argument
+        popl %ecx  # restore ecx
         decl %ecx
         jnz 1b
 
+        # restore all saved registers
+        popl %eax
+        popl %ecx
+        popl %edx
 
         movl	%ebp, %esp
         popl	%ebp

@@ -25,8 +25,6 @@ int rowCache[25];
 /*-------------------------------------------------------------------------
  * Cursor coordinates:
  */
-// static int xpos = 0;
-// static int ypos = 0;
 
 
 /*-------------------------------------------------------------------------
@@ -36,7 +34,7 @@ void putstring(char *msg) {
   long i = 0, j = 0;
   char out;
   while (*msg) {
-    for (j = 0; j < 1; j++) {
+    for (j = 0; j < 1; j++) {       // Slow down to see how string is printed
         i = 0;
         while (i < 1000000) {i++;}
     }
@@ -48,80 +46,44 @@ void putstring(char *msg) {
 }
 
 
-void putcharr(char c){
-    int i, j;
-
-    if (c!='\n' && c!='\r') {
-        (*video)[row][col][0] = c & 0xFF;
-        (*video)[row][col][1] = ATTRIBUTE;
-        col = col + 1;
-        if (col < COLUMNS) {
-            return;
-        }
-    }
-
-    col = 0;               // Perform a newline
-    if (++row >= LINES) {  // scroll up top lines of screen ... 
-        row = LINES-1;
-        for (i=0; i<row; ++i) {
-          for (j=0; j<COLUMNS; ++j) {
-            (*video)[i][j][0] = (*video)[i+1][j][0];
-            (*video)[i][j][1] = (*video)[i+1][j][1];
-          }
-        }
-        for (j=0; j<COLUMNS; ++j) { // fill in new blank line
-          (*video)[row][j][0] = ' ';
-          (*video)[row][j][1] = ATTRIBUTE;
-        }
-    }
-}
-// int compareString(char * str1, char * str2) {
-//     while (*str1) {
-//         if ( *str1++ != str2++ ) return 0;
-//     }
-//     if (*str2) return 0;
-//     return 1;
-// }
-
 void testCoordinates() {
-        col -= 2;
-        if (col < 0) {
-            row--;
-            if (row < 0) row = 0;
-            col = rowCache[row]*2;
+        if (col == 0) {     
+           row--;
+           if ( row < 0) {
+                row = 0;
+                col = 0;
+           } else {
+              col = rowCache[row];
+           }
+        } else {
+            col -= 2;
         }
 }
-void testCoordinates2() {
-        col -= 2;
-        if (col < 0) {
-            row--;
-            if (row < 0) row = 0;
-            col = 0;
-        }
-}
+
+
+// Intention was to implement simple shell to output multiboot information
+// I left it as an exercise for the future when I figure out how to implement
+// malloc alternative, although it is not necessarily
 void shell() {
     int k;
     char b = 0;
     while(1) {
-      k = getc();
-      b = (char)k; 
-      if (b == 0xD) {
-        outc('\n');
-        rowCache[row] = 0;
+      k = getc();          // Read input
+      b = (char)k;         // Convert to char
+      if (b == 0xD) {      // Test if new line
+        outc('\n');        // Output new line
+        rowCache[row] = 0; // reset char counter
       }
-      else if (b > 0x1F && b < 0x7F) {
+      else if (b > 0x1F && b < 0x7F) {  // test if printable char
+        rowCache[row]+=2; // Output and increase count
         outc(b);
-        rowCache[row]++;
       } else if (b == 0x7F) {
-        testCoordinates();
-        outc(' ');
-        testCoordinates2();
+        testCoordinates(); // reset by -1 position
+        outc(' ');         // output space
+        testCoordinates(); // reset by -1 since outc increment current col
+        rowCache[row]-=2;  // decrease cache
       }
       else {
-        //outc(b);
-        //outc(' ');
-        //outhex(b);
-        //outc('\n');
       }
     }
 }
@@ -135,7 +97,8 @@ void hello() {
     rowCache[i] = 0;
   }
   cls();
-  setAttr((10&7)<<4);
+  setAttr(0x2e); // Set attribute to default value (PSU Green)
+  outhex(0x5e);
   shell();
 }
 

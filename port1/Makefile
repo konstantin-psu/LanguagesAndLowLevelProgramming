@@ -18,9 +18,9 @@ QEMU      = qemu-system-i386
 
 .PHONY: all clean
 
-all:	cdrom.iso
+all: libs	cdrom.iso
 
-run:	cdrom.iso
+run: libs	cdrom.iso
 	$(QEMU) -m 32 -s -serial stdio -cdrom cdrom.iso
 
 cdrom.iso: cdrom
@@ -52,12 +52,15 @@ hello.s: hello.c videoasm.o bootinfo.o
 videoasm.o:	videoasm.s
 	gcc -m32 -c -Wa,-alsnm=videoasm.lst videoasm.s
 
-bootinfo.o: bootinfo.c
+bootinfo.o: bootinfo.c libs
 	$(CC) ${CCOPTS}  -I simpleio -o bootinfo.o -c bootinfo.c
+
+libs:
+	make -C simpleio
 
 #----------------------------------------------------------------------------
 # tidy up after ourselves ...
 clean:
-	-rm -rf cdrom cdrom.iso hello *.o *.lst *.map
+	-rm -rf cdrom cdrom.iso hello *.o *.lst *.map && make clean -C simpleio
 
 #----------------------------------------------------------------------------
