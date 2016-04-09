@@ -1,7 +1,8 @@
 cdrom
 cdrom.iso
-hello
+hello 
 *.o
 *.lst
 *.map
 *.aux
+*.a
