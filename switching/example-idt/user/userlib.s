@@ -8,6 +8,7 @@ entry:	leal	stack, %esp
 stack:
 
 	# System call to print a character in the kernel's window
+    .text
 	.globl	kputc
 kputc:	pushl	%eax
 	mov	8(%esp), %eax
@@ -15,3 +16,7 @@ kputc:	pushl	%eax
 	popl	%eax
 	ret
 
+    .globl yield
+yield:
+    hlt
+    jmp yield

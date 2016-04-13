@@ -6,8 +6,8 @@ include Makefile.common
 #BOOT = hello
 #BOOT = bootinfo
 #BOOT = example-mimg
-BOOT = example-gdt
-#BOOT = example-idt
+#BOOT = example-gdt
+BOOT = example-idt
 
 all:	libs
 	make -C ${BOOT}

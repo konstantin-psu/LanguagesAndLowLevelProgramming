@@ -1,8 +1,10 @@
-/* A simple program that we will run in user mode.
- */
+/** 
+ * A simple program that we will run in user mode.
+ **/
 #include "simpleio.h"
 
 extern void kputc(unsigned);
+extern void yield(void);
 
 void kputs(char* s) {
   while (*s) {
@@ -20,7 +22,10 @@ void cmain() {
     puts("hello, user console\n");
   }
   puts("\n\nUser code does not return\n");
-  for (;;) { /* Don't return! */
-  }
+  //for (;;) { /* Don't return! */
+    //kputc('A');
+    //kputc('\n');
+  yield();
+  //}
   puts("This message won't appear!\n");
 }
