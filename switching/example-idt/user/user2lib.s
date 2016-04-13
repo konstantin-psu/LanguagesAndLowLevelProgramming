@@ -19,9 +19,5 @@ kputc:	pushl	%eax
     .globl yield
 yield:
     int $129
-    ret
-
-    .globl hold
-hold:
-    int $130
+    # int $130
     ret

@@ -20,7 +20,15 @@ void initContext(struct Context* ctxt, unsigned eip, unsigned esp) {
   ctxt->iret.eflags = INIT_USER_FLAGS;
 }
 
+
 struct Context user;
+struct Context user2;
+
+void yieldimp() {
+  printf("Yielding ...");
+  switchToUser(&user);
+}
+int count = 0;
 
 void kernel() {
   struct BootData* bd = (struct BootData*)0x1000;
@@ -49,6 +57,7 @@ void kernel() {
 
   printf("user code is at 0x%x\n", hdrs[9]);
   initContext(&user, hdrs[9], 0);
+  initContext(&user2, hdrs[10], 1);
   printf("user is at %x\n", (unsigned)(&user));
   switchToUser(&user);
   printf("This message shouldn't appear!\n");
@@ -59,5 +68,11 @@ void csyscall() {  /* A trivial system call */
 /*printf("eax=%x, ebx=%x, retaddr=%x, esp=%x\n",
          user.regs.eax, user.regs.ebx, user.iret.eip, user.iret.esp);*/
   putchar(user.regs.eax);
-  switchToUser(&user);
+  if (count % 2) {
+    count ++;
+    switchToUser(&user);
+  } else {
+    count ++;
+    switchToUser(&user2);
+  }
 }

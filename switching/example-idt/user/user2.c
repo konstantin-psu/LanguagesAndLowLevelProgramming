@@ -15,15 +15,15 @@ void kputs(char* s) {
 
 void cmain() {
   int i;
-  setWindow(1, 11, 47, 32);   // user process on right hand side
+  setWindow(13, 11, 47, 32);   // user process on right hand side
   cls();
-  puts("in user1 code\n");
+  puts("in user2 code\n");
   for (i=0; i<4; i++) {
-    kputs("hello, kernel1 console\n");
-    puts("hello, user1 console\n");
+    kputs("hello, kernel2 console\n");
+    puts("hello, user2 console\n");
   }
-  puts("\n\nUser code does not return\n");
+  puts("\n\nUser2 code does not return\n");
   yield();
   hold();
-  puts("This message won't appear!\n");
+  puts("This message2 won't appear!\n");
 }

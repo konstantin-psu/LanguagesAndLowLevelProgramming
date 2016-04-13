@@ -241,6 +241,8 @@ initIDT:# Add descriptors for exception & interrupt handlers:
         # user mode without generating a general protection fault, so they
         # will be tagged with dpl=3
 	idtcalc	handler=syscall, slot=0x80, dpl=3
+	idtcalc	handler=yieldimp, slot=0x81, dpl=3
+	idtcalc	handler=handlecall, slot=0x82, dpl=3
 
 	# Install the new IDT:
 	lidt	idtptr
@@ -323,6 +325,9 @@ syscall:subl	$4, %esp	# Fake an error code
 	leal	stack, %esp	# Switch to kernel stack
 	jmp	csyscall
 
+handlecall:
+    hlt
+    jmp handlecall
 #--------------------------------------------------------------------------
 # Switch to user mode:  Takes a single parameter, which provides the
 # initial context for the user process.
