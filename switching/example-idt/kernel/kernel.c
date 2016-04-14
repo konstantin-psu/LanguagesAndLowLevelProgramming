@@ -57,7 +57,7 @@ void kernel() {
 
   printf("user code is at 0x%x\n", hdrs[9]);
   initContext(&user, hdrs[9], 0);
-  initContext(&user2, hdrs[10], 1);
+  initContext(&user2, hdrs[12], 0);
   printf("user is at %x\n", (unsigned)(&user));
   switchToUser(&user);
   printf("This message shouldn't appear!\n");

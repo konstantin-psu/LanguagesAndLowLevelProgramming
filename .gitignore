@@ -1,1 +1,5 @@
 *.swp
+*.iso
+*.o
+*.lst
+*.map

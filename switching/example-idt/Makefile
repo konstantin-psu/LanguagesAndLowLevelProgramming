@@ -5,6 +5,7 @@ all:	cdrom.iso
 
 run:	cdrom.iso
 	$(QEMU) -m 32 -serial stdio -cdrom cdrom.iso
+	stty sane
 
 include ../Makefile.cdrom
 
