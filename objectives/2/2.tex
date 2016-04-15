@@ -1,0 +1,208 @@
+\documentclass{article}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage[plain]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumerate}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{forest}
+\usepackage[shortlabels]{enumitem}
+     \setlist[enumerate, 1]{1\textsuperscript{o}}
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
+%\usetikzlibrary{automata,positioning}
+\usetikzlibrary{positioning,shapes,shadows,arrows,automata}
+
+%
+% Basic Document Settings
+%
+
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1}
+
+\pagestyle{fancy}
+\lhead{\hmwkAuthorName}
+\chead{(\hmwkClassInstructor\ \hmwkClassTime): \hmwkTitle}
+\rhead{\firstxmark}
+\lfoot{\lastxmark}
+\cfoot{\thepage}
+
+\renewcommand\headrulewidth{0.4pt}
+\renewcommand\footrulewidth{0.4pt}
+
+\setlength\parindent{0pt}
+
+%
+% Create Problem Sections
+%
+
+\newcommand{\enterProblemHeader}[1]{
+    \nobreak\extramarks{}{Problem \arabic{#1} continued on next page\ldots}\nobreak{}
+    \nobreak\extramarks{Problem \arabic{#1} (continued)}{Problem \arabic{#1} continued on next page\ldots}\nobreak{}
+}
+
+\newcommand{\exitProblemHeader}[1]{
+    \nobreak\extramarks{Problem \arabic{#1} (continued)}{Problem \arabic{#1} continued on next page\ldots}\nobreak{}
+    \stepcounter{#1}
+    \nobreak\extramarks{Problem \arabic{#1}}{}\nobreak{}
+}
+
+\setcounter{secnumdepth}{0}
+\newcounter{partCounter}
+\newcounter{homeworkProblemCounter}
+\setcounter{homeworkProblemCounter}{1}
+\nobreak\extramarks{Problem \arabic{homeworkProblemCounter}}{}\nobreak{}
+
+%
+% Homework Problem Environment
+%
+% This environment takes an optional argument. When given, it will adjust the
+% problem counter. This is useful for when the problems given for your
+% assignment aren't sequential. See the last 3 problems of this template for an
+% example.
+%
+\newenvironment{homeworkProblem}[1][-1]{
+    \ifnum#1>0
+        \setcounter{homeworkProblemCounter}{#1}
+    \fi
+    \section{Problem \arabic{homeworkProblemCounter}}
+    \setcounter{partCounter}{1}
+    \enterProblemHeader{homeworkProblemCounter}
+}{
+    \exitProblemHeader{homeworkProblemCounter}
+}
+
+%
+% Homework Details
+%   - Title
+%   - Due date
+%   - Class
+%   - Section/Time
+%   - Instructor
+%   - Author
+%
+
+\newcommand{\hmwkTitle}{Portfolio submission\ \#2, Topic 2}
+\newcommand{\hmwkDueDate}{April 15, 2016}
+\newcommand{\hmwkClass}{CS510 Languages and Low Level Programming}
+\newcommand{\hmwkClassTime}{Spring 2016}
+\newcommand{\hmwkClassInstructor}{Mark P. Jones}
+\newcommand{\hmwkAuthorName}{Konstantin Macarenco}
+
+%
+% Title Page
+%
+
+\title{
+    \vspace{2in}
+    \textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+    \normalsize\vspace{0.1in}\small{Due\ on\ \hmwkDueDate\ at 11:59pm}\\
+    \vspace{0.1in}\large{\textit{\hmwkClassInstructor\ \hmwkClassTime}}
+    \vspace{3in}
+}
+
+\author{\textbf{\hmwkAuthorName}}
+\date{}
+
+\renewcommand{\part}[1]{\textbf{\large Part \Alph{partCounter}}\stepcounter{partCounter}\\}
+
+%
+% Various Helper Commands
+%
+
+% Useful for algorithms
+\newcommand{\alg}[1]{\textsc{\bfseries \footnotesize #1}}
+
+% For derivatives
+\newcommand{\deriv}[1]{\frac{\mathrm{d}}{\mathrm{d}x} (#1)}
+
+% For partial derivatives
+\newcommand{\pderiv}[2]{\frac{\partial}{\partial #1} (#2)}
+
+% Integral dx
+\newcommand{\dx}{\mathrm{d}x}
+
+% Alias for the Solution section header
+\newcommand{\solution}{\textbf{\large Solution}}
+
+% Probability commands: Expectation, Variance, Covariance, Bias
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Bias}{\mathrm{Bias}}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+%\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
+\textbf{Attempted Topic: }\\
+Discuss common challenges in low-level systems software development, including debugging in
+a bare metal environment.\\
+
+Narrative
+\vspace{0.5cm}
+
+%CCCCOOOO
+
+There are many areas where low-level systems software development is used, for many
+different reasons, like OS performance optimization, removing middle layer software due to strict
+hardware requirements (like embedded systems), necessity of a small footprint etc. \\
+
+\indent
+Programming in low level mode proves to be difficult and error prone. It requires high
+attention to small details and good knowledge of the used hardware. There is very little, if none,
+abstraction that most of the programmers normally rely on, most of the OS facilities and API are not
+available. Additional challenge is the lack of trivial debugging tools (not talking about
+debugger), sometimes simple methods like printf() are out of consideration. For example a
+common debugging technique in low level applications for Raspberry PI, is to blink attached
+LED light, which is similar to POST beep codes, which BTW according to specs are not always
+guaranteed.  There is no easy way to go through program's logic, inspect memory and variables values.
+As mentioned before deep understanding of the used hardware, such as CPU
+Registers, Context Switching, Interrupts, MTU etc., is the essential part of such a
+development, without it even simple task can create many potential problems, learning these
+technical details is a dull and meticulous, for example Intel x86-32 documentation is more than
+3000 pages long. Most modern high level languages that considered to be ``safe'', like Java,
+Python, C\# are not usually available for Low-Level systems programming. Most often programs
+for bare metal, written in combination of C and assembly. These languages are very powerful,
+but unforgiving to unexperienced programmers. Most of the current security issues are
+created by their use. This problem is especially significant in environments without common
+debugging tools, like bare metal systems.
+\\
+
+However there are several approaches, that try to solve some of the problems mentioned above.\\
+\begin{enumerate}[1.]
+\item Run low level systems application within instrumented virtual machine that emulate desired 
+computer architecture, and provide similar functionality as a debugger. 
+    There are some issues with this approach: this type of ``Debuggers'' are
+usually costly (up to \$6k), and these tools are typically available for most common
+computer architectures like x86. If you have something less common you are out of luck.
+\item Another approach is to create code that will
+work equally under low level systems and under normal OS, with only recompilation required
+to transfer from one to another, however this is not always achievable.
+\item Use visible stat
+
+\end{enumerate}
+
+%CCCCOOO1
+
+\end{document}
