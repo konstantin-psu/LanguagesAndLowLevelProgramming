@@ -3,3 +3,5 @@
 *.o
 *.lst
 *.map
+*.aux
+*.log
