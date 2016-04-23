@@ -16,6 +16,16 @@ all:	libs
 run:	libs
 	make -C ${BOOT} run
 
+all_targets: libs
+	make -C hello
+	make -C simpleio
+	make -C bootinfo
+	make -C mimg
+	make -C example-mimg
+	make -C example-gdt
+	make -C example-idt
+	make -C paging1
+
 libs:
 	make -C simpleio
 	make -C mimg
