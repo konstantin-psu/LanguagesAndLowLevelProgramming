@@ -6,7 +6,5 @@
 *.aux
 *.log
 *.c~
-kernel
-user
-user2
 *.a
+cdrom
