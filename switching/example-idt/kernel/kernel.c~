@@ -1,11 +1,6 @@
 #include "simpleio.h"
 #include "mimguser.h"
 #include "context.h"
-#include "hardware.h"
-
-extern void initPIC();
-
-
 
 /* Initialize a context with specified eip and esp values.
  */
@@ -26,52 +21,23 @@ void initContext(struct Context* ctxt, unsigned eip, unsigned esp) {
 }
 
 
+struct Context user;
 struct Context user2;
-struct Context user[2];
-struct Context * current;
-
-static void tick() {
-  static unsigned totalTicks = 0;
-  totalTicks++;
-  printf("Tick\n");
-  setWindow(0, 1, 1, 8);   // kernel on left hand side
-  printf("TotalTicks since start %d\n", totalTicks);
-  setWindow(2, 22, 0, 45);   // kernel on left hand side
-  static unsigned ticks = 0;
-  ticks++;
-  if ((ticks&15)==0) {
-      printf("ContextSwitch\n");
-      current = (current==user) ? (user+1) : user;
-  }
-}
-
-void timerInterrupt() {
-  printf("TimerInterrupt\n");
-  maskAckIRQ(TIMERIRQ);
-  enableIRQ(TIMERIRQ);
-  tick();
-  switchToUser(current);
-}
 
 void yieldimp() {
   printf("Yielding ...");
-  current = (current==user) ? (user+1) : user;
-  switchToUser(current);
+  switchToUser(&user);
 }
+int count = 0;
 
 void kernel() {
   struct BootData* bd = (struct BootData*)0x1000;
   unsigned* hdrs      = bd->headers;
   unsigned* mmap      = bd->mmap;
   unsigned  i;
-  setAttr(0x2e);
-  cls();  
   setWindow(2, 22, 0, 45);   // kernel on left hand side
-  setAttr(7);
   cls();
   printf("Protected kernel has booted!\n");
-  initPIC();
-  startTimer();
 
   printf("Headers:\n");
   for (i=0; i<hdrs[0]; i++) {
@@ -90,12 +56,10 @@ void kernel() {
   printf(" imgline: %s [%x]\n", bd->imgline, bd->imgline);
 
   printf("user code is at 0x%x\n", hdrs[9]);
-  initContext(user, hdrs[9], 0);
-  initContext(user + 1, hdrs[12], 0);
-  current = user;
-  printf("user is at %x\n", (unsigned)(user));
-  printf("userr2 is at %x\n", (unsigned)(user + 1));
-  switchToUser(current);
+  initContext(&user, hdrs[9], 0);
+  initContext(&user2, hdrs[12], 0);
+  printf("user is at %x\n", (unsigned)(&user));
+  switchToUser(&user);
   printf("This message shouldn't appear!\n");
 }
 
@@ -103,6 +67,12 @@ void csyscall() {  /* A trivial system call */
 /*printf("We made it back into the kernel :-)\n");*/
 /*printf("eax=%x, ebx=%x, retaddr=%x, esp=%x\n",
          user.regs.eax, user.regs.ebx, user.iret.eip, user.iret.esp);*/
-  putchar(current->regs.eax);
-  switchToUser(current);
+  putchar(user.regs.eax);
+  if (count % 2) {
+    count ++;
+    switchToUser(&user);
+  } else {
+    count ++;
+    switchToUser(&user2);
+  }
 }

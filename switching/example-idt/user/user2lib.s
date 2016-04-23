@@ -12,12 +12,16 @@ stack:
 	.globl	kputc
 kputc:	pushl	%eax
 	mov	8(%esp), %eax
-	int	$128
+	int	$0x80
 	popl	%eax
 	ret
 
     .globl yield
 yield:
-    int $129
-    # int $130
+    int $0x81
+    ret
+
+    .globl hold
+hold:
+    int $0x82
     ret

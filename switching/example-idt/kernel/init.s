@@ -244,6 +244,8 @@ initIDT:# Add descriptors for exception & interrupt handlers:
 	idtcalc	handler=yieldimp, slot=0x81, dpl=3
 	idtcalc	handler=handlecall, slot=0x82, dpl=3
 
+	idtcalc	handler=timerHandler, slot=0x20, dpl=0
+
 	# Install the new IDT:
 	lidt	idtptr
 	ret
@@ -328,10 +330,21 @@ syscall:subl	$4, %esp	# Fake an error code
 handlecall:
     hlt
     jmp handlecall
+
+timerHandler:
+        sub     $4, %esp
+        push    %gs
+        push    %fs
+        push    %es
+        push    %ds
+        pusha
+        leal    stack, %esp
+        jmp     timerInterrupt
 #--------------------------------------------------------------------------
 # Switch to user mode:  Takes a single parameter, which provides the
 # initial context for the user process.
 #
+
 # Size of context is 4 * (8 + 4 + 6) = 4*18 = 72
 # - 8 general registers: edi, esi, ebp, esp, ebx, edx, ecx, eax
 # - 4 segment registers: ds, es, fs, gs

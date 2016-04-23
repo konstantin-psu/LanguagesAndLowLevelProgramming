@@ -37,8 +37,8 @@ struct Iret {
 #define IOPL_SHIFT       12   /* shift for IO protection level in eflags */
 #define IF_SHIFT          9   /* shift for interrupt flags in eflags     */
 #define FLAGS_RESERVED  0x2   /* Intel reserved bits in eflags           */
-/*#define INIT_USER_FLAGS (3<<IOPL_SHIFT | 1<<IF_SHIFT | FLAGS_RESERVED)*/
-#define INIT_USER_FLAGS (3<<IOPL_SHIFT | FLAGS_RESERVED)
+#define INIT_USER_FLAGS (3<<IOPL_SHIFT | 1<<IF_SHIFT | FLAGS_RESERVED)
+//#define INIT_USER_FLAGS (3<<IOPL_SHIFT | FLAGS_RESERVED)
 
 /* The complete frame that is created to capture the context of user
  * code when an interrupt occurs.
