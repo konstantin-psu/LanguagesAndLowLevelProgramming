@@ -4,8 +4,11 @@ include Makefile.common
 .phony: all run libs clean
 
 #BOOT = hello
-BOOT = bootinfo
+#BOOT = bootinfo
 #BOOT = example-mimg
+#BOOT = example-gdt
+#BOOT = example-idt
+BOOT = paging1
 
 all:	libs
 	make -C ${BOOT}
@@ -23,5 +26,8 @@ clean:
 	make -C bootinfo           clean
 	make -C mimg               clean
 	make -C example-mimg       clean
+	make -C example-gdt        clean
+	make -C example-idt        clean
+	make -C paging1            clean
 
 #----------------------------------------------------------------------------
