@@ -32,6 +32,10 @@ paging.o:	paging.c paging.h memory.h
 .S.o:
 	$(CC) -Wa,-alsm=$*.lst ${INCPATH} ${CCDEFS} -o $*.o -c $*.S
 
+.PHONY: twiddletests
+twiddletests: twiddletests.c memory.h
+	gcc -o twiddletests twiddletests.c memory.h
+	./twiddletests
 #----------------------------------------------------------------------------
 # tidy up after ourselves ...
 clean:

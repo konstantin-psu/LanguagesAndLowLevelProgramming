@@ -24,5 +24,7 @@ void test(unsigned val) {
 int main(int argc, char** argv) {
     test(0x1234);
     test(0x2000);
+    test(0x1fff);
+    return 0;
 }
 

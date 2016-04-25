@@ -15,6 +15,24 @@ extern void      fatal(char* msg);
 struct Pdir* allocPdir() {
   // Allocate a fresh page directory:
   struct Pdir* pdir = (struct Pdir*)allocPage();
+  unsigned dir = toPhys(pdir);
+  printf("physical address of the directory %x\n",dir);
+  unsigned superPSize = 0;
+  unsigned fl1 = 0;
+  unsigned i = 0;
+  superPSize = (PHYSMAP >> SUPERSIZE);
+  unsigned * dp;
+  printf("PHYSMAP %x SUPERSIZE %x superPSize %x\n",PHYSMAP, SUPERSIZE, superPSize);
+
+  fl1 = (PERMS_KERNELSPACE);
+  for (i = 0; i< superPSize; i++) {
+    printf("i %d fl1 %x\n",i, fl1);
+    dp = ((unsigned *)dir) + (KERNEL_SPACE >> SUPERSIZE) + i;
+    *dp = fl1;
+    // dir += 1;
+    fl1 += 4 << 20;
+  }
+
 
   // TODO: Add superpage mappings to pdir for the first PHYSMAP
   // bytes of physical memory.  You should use a bitwise or
@@ -42,9 +60,21 @@ void mapPage(struct Pdir* pdir, unsigned virt, unsigned phys) {
 
     // Make sure that the virtual address is in user space.
     if (virt>=KERNEL_SPACE) {
+         // printf("KERNEL_SPACE %x virtual address %x\n", KERNEL_SPACE, virt);
         fatal("virtual address is in kernel space");
     }
 
+    printf("  Page directory at %x\n", pdir);
+    for (unsigned i=0; i<1024; i++) {
+      if (pdir->pde[i]&1) {
+        if (pdir->pde[i]&0x80) {
+          printf("    %x: [%x-%x] => [%x-%x], superpaaage\n",
+                 i, (i<<SUPERSIZE), ((i+1)<<SUPERSIZE)-1,
+                 alignTo(pdir->pde[i], SUPERSIZE),
+                 alignTo(pdir->pde[i], SUPERSIZE) + 0x3fffff);
+        } 
+      }
+    }
     // TODO: Find the relevant entry in the page directory
 
     // TODO: report a fatal error if there is already a
