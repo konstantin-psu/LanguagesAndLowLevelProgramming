@@ -9,3 +9,4 @@
 *.a
 cdrom
 .idea
+CMakeLists.txt
