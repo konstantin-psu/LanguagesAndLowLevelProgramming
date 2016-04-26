@@ -67,8 +67,8 @@
 \newcounter{partCounter}
 
 
-\newcommand{\hmwkTitle}{Portfolio submission\ \#2, Topic 5}
-\newcommand{\hmwkDueDate}{April 22, 2016}
+\newcommand{\hmwkTitle}{Portfolio submission\ \#3, Topic 5}
+\newcommand{\hmwkDueDate}{April 30, 2016}
 \newcommand{\hmwkClass}{CS510 Languages and Low Level Programming}
 \newcommand{\hmwkClassTime}{Spring 2016}
 \newcommand{\hmwkClassInstructor}{Mark P. Jones}
@@ -121,21 +121,23 @@
 
 %\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
 \textbf{Attempted Topic: }\\
-Describe the motivation,implementation, and application of microkernel abstractions for 
-managing address spaces,threads, and interprocess com-munication (IPC).
+Describe the key steps in a typical boot process, including the role of a bootloader.
 
-\begin{table}[h!]
-\centering
-\caption{My caption}
-\label{my-label}
-\begin{tabular}{ll}
- &   \\
- &   \\
- &  
-\end{tabular}
-\end{table}
-
-
+\begin{enumerate}[1.]
+\item The CPU is initialized
+    \begin{enumerate}[1.]
+        \item Initialize itself when power is first applied or when the system is reset
+        \item Basic self test
+        \item Initialize registers to known states
+        \item including the instruction pointer/program counter (On IA32, for example,
+eip is set to $0xFFFFFFF0$, so the computer can begin executing programs. And those
+programs can initialize the devices. But only if those programs are in memory.
+    \end{enumerate}
+\item The memory contains the apps and data that we need
+\item The devices are initialized and operational
+\end{enumerate}
+CPU $\rightarrow$ SCAN DEVICES $\rightarrow$ FIND MBR $\rightarrow$ LOAD MBR
+$\rightarrow$ MBR CODE $\rightarrow$ GRUB $\rightarrow$ KERNEL + MODULES; 
 %CCCCOOO1
 
 \end{document}
