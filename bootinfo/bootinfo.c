@@ -19,6 +19,16 @@ extern unsigned              mbi_magic;
 # define MBI_MODS_VALID           (1 << 3)
 # define MBI_MMAP_VALID           (1 << 6)
 
+struct MultibootDrives {
+   unsigned size;
+   unsigned char  drive_number;
+   unsigned char  drive_mode;
+   unsigned short drive_cylinders;
+   unsigned char  drive_heads;
+   unsigned char  drive_sectors;
+   short * drive_prots;
+};
+
 struct MultibootInfo {
   unsigned                  flags;
   unsigned                  memLower;
@@ -66,17 +76,8 @@ struct MultibootMMap {
   unsigned type;
 };
 
-struct MultiBootDrives {
-   unsigned size;
-   unsigned char  drive_number;
-   unsigned char  drive_mode;
-   unsigned short drive_cylinders;
-   unsigned char  drive_heads;
-   unsigned char  drive_sectors;
-   short * drive_prots;
-};
 
-struct MultBootApmTable {
+struct MultibootApmTable {
    unsigned short version;
    unsigned short cseg;
    unsigned       offset;
@@ -171,26 +172,51 @@ void bootinfo() {
   if (print_flag("7.   MBI_DRIVES_VALID"               , 7)) {
     printf("    ->drives_legth: %d\n", mbi->drivesLength);
     printf("    ->drivesSize:   %d\n", mbi->drives->size);
-    //for (i = 0; i < mbi->mmap->size; i++) {
-    //    printf("    ->MMAP ENTRY   :   %d\n", i);
-    //    printf("        ->baseLo       :   0x%x\n", mbi->mmap->baseLo);
-    //    printf("        ->baseHi       :   0x%x\n", mbi->mmap->baseHi);
-    //    printf("        ->lenLo        :   0x%x\n", mbi->mmap->lenLo);
-    //    printf("        ->lenHi        :   0x%x\n", mbi->mmap->lenHi);
-    //    printf("        ->type         :   %d\n",   mbi->mmap->type);
-    //}
+    for (i = 0; i < mbi->drives->size; i++) {
+        printf("    ->DRIVE ENTRY   :   %d\n", i);
+        printf("        ->driveNumber       :   %u\n", mbi->drives->drive_number);
+        printf("        ->driveMode         :   %u\n", mbi->drives->drive_mode);
+        printf("        ->driveCylinders    :   %hu\n",mbi->drives->drive_cylinders);
+        printf("        ->driveHeads        :   %u\n", mbi->drives->drive_heads);
+        printf("        ->driveSectors      :   %u\n",   mbi->drives->drive_sectors);
+    }
 
   }
+//struct MultibootApmTable {
+//   unsigned short version;
+//   unsigned short cseg;
+//   unsigned       offset;
+//   unsigned short cseg_16;
+//   unsigned short dseg;
+//   unsigned short flags;
+//   unsigned short cseg_len;
+//   unsigned short cseg_16_len;
+//   unsigned short dseg_len;
   if (print_flag("8.   MBI_CONFIG_TABLE_VALID"         , 8)) {
 
   }
   if (print_flag("9.   MBI_BOOT_LOADER_NAME_FLAG_VALID", 9)) {
+        printf("        ->bootLoaderName      :   %s\n",   mbi->bootLoaderName);
 
   }
   if (print_flag("10.  MBI_APM_TABLE_VALID"            , 10)) {
-
+     printf("        ->version       :   %u\n", mbi->apmTable->version);
+     printf("        ->cseg          :   %u\n", mbi->apmTable->cseg);
+     printf("        ->offset        :   %d\n", mbi->apmTable->offset);
+     printf("        ->cseg_16       :   %u\n", mbi->apmTable->cseg_16);
+     printf("        ->dseg          :   %u\n", mbi->apmTable->dseg);
+     printf("        ->flags         :   %u\n", mbi->apmTable->flags);
+     printf("        ->cseg_len      :   %u\n", mbi->apmTable->cseg_len);
+     printf("        ->cseg_16_len   :   %u\n", mbi->apmTable->cseg_16_len);
+     printf("        ->dseg_len      :   %u\n", mbi->apmTable->dseg_len);
   }
   if (print_flag("11.  MBI_GRAPHICS_TABLE_VALID"       , 11)) {
+     printf("        ->vbeControlInfo    :   %d\n", mbi->vbeControlInfo);
+     printf("        ->vbeModeInfo       :   %d\n", mbi->vbeModeInfo);
+     printf("        ->vbeMode           :   %d\n", mbi->vbeMode);
+     printf("        ->vbeInterfaceSeg   :   %d\n", mbi->vbeInterfaceSeg);
+     printf("        ->vbeInterfaceOff   :   %d\n", mbi->vbeInterfaceOff);
+     printf("        ->vbeInterfaceLen   :   %d\n", mbi->vbeInterfaceLen);
 
   }
   printf("MBI_FLAGS 12 - 31 ignored and omitted\n");
