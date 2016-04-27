@@ -27,7 +27,7 @@ unsigned physEnd;    // Set during initialization to end of memory pool
 
 //#define fromPhys(t, addr) ((t)(addr+KERNEL_SPACE))
 unsigned* allocPage() {
-    printf("You have not implemented the allocPage() function (yet)!\n");
+    //printf("You have not implemented the allocPage() function (yet)!\n");
 
     unsigned size = 0;
     size  = physEnd - physStart;
@@ -197,18 +197,20 @@ void kernel() {
   // created page directory, but who knows what that might
   // be ... ?   :-)
 
-  // showPdir(newpdir);
   // printf("Show pagedir FINISHED\n");
   // printf("toPhysInitial %x, toPhysNew %x\n",toPhys(initdir),toPhys(newpdir));
   // printf("printf address %x phys %x\n", printf, toPhys(printf));
   //mapPage(newpdir, newpdir, toPhys(newpdir));
+  mapPage(newpdir, 0xb8000, 0xb8000); // !!!!!!!!!!!!!!!
+
+  showPdir(newpdir);
 
 #define IM_FEELING_LUCKY
 #ifdef IM_FEELING_LUCKY
   // halt();
   setPdir(toPhys(newpdir));
-  setPdir(toPhys(initdir));
-  printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+  //setPdir(toPhys(initdir));
+  printf("I am feeling lucky\n");
   halt();
 #else
   printf("Switch to the new page directory when you're ready!\n");
