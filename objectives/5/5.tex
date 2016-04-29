@@ -120,74 +120,81 @@
 \pagebreak
 
 %\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
-\textbf{Attempted Topic: }\\
-Describe the key steps in a typical boot process, including the role of a bootloader.
+        \textbf{Attempted Topic: }\\
+        Describe the key steps in a typical boot process, including the role of a bootloader.\\
 
-Boot process described in class
-CPU INIT $\rightarrow$ BIOS/UEFI (or some other ROM BOOTLOADER) $\rightarrow$ SCAN 
-DEVICES $\rightarrow$ FIND MBR $\rightarrow$ LOAD MBR
-$\rightarrow$ MBR CODE (BOOTLOADER) $\rightarrow$ GRUB $\rightarrow$ KERNEL + MODULES; 
-is very general and can be applied to almost all computer architectures.\\
+        Boot process described in class
+        CPU INIT $\rightarrow$ BIOS/UEFI (or some other ROM BOOTLOADER) $\rightarrow$ SCAN 
+        DEVICES $\rightarrow$ FIND MBR $\rightarrow$ LOAD MBR
+        $\rightarrow$ MBR CODE (BOOTLOADER) $\rightarrow$ GRUB $\rightarrow$ KERNEL + MODULES; 
+        is very general and used by almost all computer architectures.\\
 
-The sequence begins with CPU initialization, followed by self test and then \%eip  is 
-set to some predefined by the vendor address.
-Reset vectors used by various vendors:
+        The sequence begins with CPU initialization, followed by self test and then \%eip  is 
+        set to some predefined by the vendor address.
+        Reset vectors used by various vendors:
 
-\begin{enumerate}[1.]
-\item The reset vector for the 8086 processor is at physical address FFFF0h (16 bytes 
-below 1 MB).
-\item The reset vector for the 80386 and later x86 processors is physical address
-FFFFFFF0h (16 bytes below 4 GB).
-\item The reset vector for PowerPC/Power Architecture processors is at an effective
-address of 0x00000100 for 32-bit processors and 0x0000000000000100 for 64-bit
-processors.
-\item The reset vector for SPARC version 8 processors is at an address of 0x00; the 
-reset vector for SPARC version 9 processors is at an address of 0x20 for power-on 
-reset, 0x40 for watchdog reset, 0x60 for externally initiated reset, and 0x80 for
-software-initiated reset.
-\end{enumerate}
-
-Then CPU Executes ROM bootloader, which scans available devices for a Master Boot
-Record (MBR). Once record is found BIOS copies MBR to RAM and let MBR code to take over
-further execution.
-
-MBR Code - loads a bootloader from some known location on the disk. Bootloader is used 
-to prepare the computer for use. There are various types of bootloader used by 
-different vendors.
-
-\begin{enumerate}[1.]
-\item Microsoft NTLDR
-\item Apple BootX
-\item Linux GRUB
-\end{enumerate}
-
-All implementations have similar task, with differences in functionality.
-An OS kernel expects certain information available for further boot like registers set
-to predefined values, available
-memory, boot flags ans system permissions. Linux expects boot info in multiboot
-standard. Multiboot allows to treat a kernel as any other executable file in ELF
-standard. GRUB loads OS kernel according to the addresses defined in kernel's ELF
-linker script.
-\\
-
-After bootloader is done OS takes over. \\
-
-This process abstracts a Particular OS boot details from Vendor specific hardware.
+        \begin{enumerate}[1.]
+            \item The reset vector for the 8086 processor is at physical address FFFF0h (16 bytes 
+                below 1 MB).
+            \item The reset vector for the 80386 and later x86 processors is physical address
+                FFFFFFF0h (16 bytes below 4 GB).
+            \item The reset vector for PowerPC/Power Architecture processors is at an effective
+                address of 0x00000100 for 32-bit processors and 0x0000000000000100 for 64-bit
+                processors.
+            \item The reset vector for SPARC version 8 processors is at an address of 0x00; the 
+                reset vector for SPARC version 9 processors is at an address of 0x20 for power-on 
+                reset, 0x40 for watchdog reset, 0x60 for externally initiated reset, and 0x80 for
+                software-initiated reset.
+        \end{enumerate}
 
 
-%\begin{enumerate}[1.]
-%\item The CPU is initialized
-%    \begin{enumerate}[1.]
-%        \item Initialize itself when power is first applied or when the system is reset
-%        \item Basic self test
-%        \item Initialize registers to known states
-%        \item including the instruction pointer/program counter (On IA32, for example,
-%eip is set to $0xFFFFFFF0$, so the computer can begin executing programs. And those
-%programs can initialize the devices. But only if those programs are in memory.
-%    \end{enumerate}
-%\item The memory contains the apps and data that we need
-%\item The devices are initialized and operational
-%\end{enumerate}
-%CCCCOOO1
+        Then CPU Executes ROM bootloader (BIOS/EFI), which scans available devices for a Master Boot
+        Record (MBR). Once record is found BIOS copies MBR to RAM and let MBR code to take over
+        further execution.
 
-\end{document}
+        MBR Code - loads a bootloader from some known location on the disk. Bootloader is used 
+        to prepare the computer for use. There are various types of bootloader used by 
+        different vendors.
+
+        \begin{enumerate}[1.]
+            \item Microsoft NTLDR
+            \item Apple BootX
+            \item Linux GRUB
+        \end{enumerate}
+
+        All implementations have similar task, with, sometimes significant differences in functionality.
+        An OS kernel expects certain information available for further boot like registers set
+        to predefined values, available
+        memory information, boot flags ans system permissions i.e. all system information
+        required for successful work. For example 
+        Linux expects boot info in multiboot standard. Multiboot allows to treat a kernel as 
+        any other executable file in ELF
+        standard. GRUB loads OS kernel according to the addresses defined in kernel's ELF
+        linker script.
+        \\
+        Instead of listing field that multboot provides I extended bootinfo example to print all 
+        information that available to kernel.
+
+        After bootloader is it sets EIP to the address of the kernel and OS takes over. \\
+        At this stage bootloader code is no longer needed and can be deleted/overwritten.
+
+        Bootloader abstracts a Particular OS boot details from Vendor specific hardware,
+        making kernel more portable.
+
+
+        %\begin{enumerate}[1.]
+        %\item The CPU is initialized
+        %    \begin{enumerate}[1.]
+        %        \item Initialize itself when power is first applied or when the system is reset
+        %        \item Basic self test
+        %        \item Initialize registers to known states
+        %        \item including the instruction pointer/program counter (On IA32, for example,
+        %eip is set to $0xFFFFFFF0$, so the computer can begin executing programs. And those
+        %programs can initialize the devices. But only if those programs are in memory.
+        %    \end{enumerate}
+        %\item The memory contains the apps and data that we need
+        %\item The devices are initialized and operational
+        %\end{enumerate}
+        %CCCCOOO1
+
+    \end{document}

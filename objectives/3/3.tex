@@ -39,7 +39,7 @@
 
 \pagestyle{fancy}
 \lhead{\hmwkAuthorName}
-\rhead{ (\hmwkClassInstructor\ \hmwkClassTime): \hmwkTitle}
+\rhead{ (\hmwkClassInstructor\ \hmwkClassTime)}
 \lfoot{\lastxmark}
 \cfoot{\thepage}
 
@@ -67,7 +67,10 @@
 \newcounter{partCounter}
 
 
-\newcommand{\hmwkTitle}{Portfolio submission Topic 3}
+\newcommand{\hmwkTitle}{Portfolio submission Topic 3: \\
+        Explain how conventional operating system features (multiple address spaces, context 
+        switching, protection, etc.) motivate the desire for (and benefit from) hardware 
+        support. }
 \newcommand{\hmwkDueDate}{April 29, 2016}
 \newcommand{\hmwkClass}{CS510 Languages and Low Level Programming}
 \newcommand{\hmwkClassTime}{Spring 2016}
@@ -77,7 +80,7 @@
 
 \title{
     \vspace{2in}
-    \textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+    \textmd{\textbf{\hmwkClass:\ hmwkTitle}}\\
     \normalsize\vspace{0.1in}\small{Due\ on\ \hmwkDueDate\ at 11:59pm}\\
     \vspace{0.1in}\large{\textit{\hmwkClassInstructor\ \hmwkClassTime}}
     \vspace{3in}
@@ -119,26 +122,68 @@
 
 \pagebreak
 
-%\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
-\textbf{Topic}\\
-Explain how conventional operating system features (multiple address spaces, context 
-switching, protection, etc.) motivate the desire for (and benefit from) hardware 
-support.
 
-\vspace{0.5cm}
+        \vspace{1cm}
+
+%CCSS
+
+        The main benefit of implementing some of the OS features in hardware is
+        performance and security.
+        Specialized hardware will be in most of the cases many times faster than general
+        software. Some tasks are simply not feasible without some level or hardware
+        support. 
+
+        Software approach reduces cost and complexity of hardware centric systems. And
+        vice versa performance of software is increased by special purpose hardware.\\
+
+        \textbf{Memory Management}\\
+
+        Programming first computers without any memory management aid was a big headache.
+        What to do when a task runs out of memory? How to feet larger applications into
+        available RAM? How to protect one task from corrupting another's task memory? Etc.\\
+
+        Memory Management Infrastructure development was driven by the 
+        concept of Virtual Memory which required to support of multiple address spaces.
+        Dynamic translation between virtual and physical addresses. This concept would be
+        too slow and prone to security problems if implemented in pure software. 
+        Memory management hardware solves following issues related to Virtual Memory and
+        Address spaces:
+        \begin{itemize}
+            \item Fast memory translation.
+            \item Address Space Switch.
+            \item Address Space isolation.
+            \item Memory overflow protection (swapping).
+        \end{itemize}
+
+        Memory protection tries to solve problem of a process affecting other processes or the OS
+        memory. Without hardware support this problem is impossible to solve since during  execution
+        cap current process is in total control and can do anything without proper protection
+        mode. Protection rings, segmentation and paging enable this feature.
+        OS creates page table and changes cr3 to point to the current page table. This is
+        a privileged instruction and can be only done in ring0. \\
+
+        I see two possible solutions without hardware support (neither is as good as
+        having hardware support)
+        \begin{itemize}
+            \item An OS provides virtualised environment (virtual machine that implements
+                hardware protection). This approach raises some performance problems.
+            \item OS can periodically scan memory for violation. This approach is more of
+                a debugging tool, it is a lot less secure and doesn't prevent from interprocess 
+                memory access.
+        \end{itemize}
+
+        \textbf{Context Switching}\\
+        
+        I was surprised to learn that context switch in modern OSs is a software
+        feature. Intel task switch mechanism nowadays is used mainly to transfer from one
+        protection level to another. Linux creates only on TSS(segmentation related
+        feature) for this purpose and uses
+        ESP0 and SS0 for this purpose. Hardware context switch is appeared to be slower
+        less flexible and portable from x86 to x86\_64.\\
 
 
-The main benefit of implementing some of the OS features in hardware is performance.
-Specialized hardware will be in most of the cases many times faster than hardware,
-however implementing every single abstraction would make hardware OS dependent.
 
-When feature is common enough or has been accepted as something vital it is almost
-always better to implement it the hardware.
-
-Memory management unit in Pure software 
-For ex
-
-
-When feature becomes permanent, or in high demand, such as context switching 
+%CCEE
+        % When feature becomes permanent, or in high demand, such as context switching 
 
 \end{document}
