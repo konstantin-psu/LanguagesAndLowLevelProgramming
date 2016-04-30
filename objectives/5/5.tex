@@ -129,6 +129,8 @@
         $\rightarrow$ MBR CODE (BOOTLOADER) $\rightarrow$ GRUB $\rightarrow$ KERNEL + MODULES; 
         is very general and used by almost all computer architectures.\\
 
+        %CCSS
+
         The sequence begins with CPU initialization, followed by self test and then \%eip  is 
         set to some predefined by the vendor address.
         Reset vectors used by various vendors:
@@ -149,12 +151,12 @@
 
 
         Then CPU Executes ROM bootloader (BIOS/EFI), which scans available devices for a Master Boot
-        Record (MBR). Once record is found BIOS copies MBR to RAM and let MBR code to take over
+        Record (MBR). Once the record is found BIOS copies MBR to RAM and let MBR code to take over
         further execution.
 
         MBR Code - loads a bootloader from some known location on the disk. Bootloader is used 
-        to prepare the computer for use. There are various types of bootloader used by 
-        different vendors.
+        to setup the computer and provide some vital information to OS. There are various types of 
+        bootloader used by different vendors.
 
         \begin{enumerate}[1.]
             \item Microsoft NTLDR
@@ -163,7 +165,7 @@
         \end{enumerate}
 
         All implementations have similar task, with, sometimes significant differences in functionality.
-        An OS kernel expects certain information available for further boot like registers set
+        OS expects certain information available for proper functioning like registers set
         to predefined values, available
         memory information, boot flags ans system permissions i.e. all system information
         required for successful work. For example 
@@ -175,11 +177,11 @@
         Instead of listing field that multboot provides I extended bootinfo example to print all 
         information that available to kernel.
 
-        After bootloader is it sets EIP to the address of the kernel and OS takes over. \\
+        After bootloader is done it sets EIP to the address of the first kernel instruction 
+        and OS takes over. \\
         At this stage bootloader code is no longer needed and can be deleted/overwritten.
 
-        Bootloader abstracts a Particular OS boot details from Vendor specific hardware,
-        making kernel more portable.
+        %CCEE
 
 
         %\begin{enumerate}[1.]
@@ -195,6 +197,5 @@
         %\item The memory contains the apps and data that we need
         %\item The devices are initialized and operational
         %\end{enumerate}
-        %CCCCOOO1
 
     \end{document}
