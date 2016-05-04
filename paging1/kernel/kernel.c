@@ -7,6 +7,7 @@
 #include "context.h"
 #include "paging.h"
 #include "memory.h"
+#include "hardware.h"
 
 /*-------------------------------------------------------------------------
  * Basic code for halting the processor and reporting a fatal error:
@@ -230,17 +231,27 @@ void kernel() {
 
     // TODO: reinstate the following code ... but we'll get to that
     // next time!
-    // bd = fromPhys(struct BootData*, 0x1000);
-    // hdrs      = bd->headers;
-    // mmap      = bd->mmap;
+    struct BootData* bdNew = fromPhys(struct BootData*, 0x1000);
+    
+    // unsigned * hdrsNew      = fromPhys(unsigned *, hdrs);
+    unsigned * hdrsNew      = (unsigned *) (hdrs + KERNEL_SPACE);
 
+    //hdrsNew = fromPhys(unsigned *, hdrsNew);
+    // hdrsNew = , hdrsNew);
     printf("-- kernel -- : user lo 0x%x user hi 0x%x\n", userLo, userHi);
     mapRegion(newpdir, userLo, userHi);
-    // printf("user code is at 0x%x\n", hdrs[9]);
-    // initContext(&user, hdrs[9], 0);
-    // printf("user is at %x\n", (unsigned)(&user));
-    // switchToUser(&user);
     showPdir(newpdir);
+
+    printf("user code is at 0x%x\n", hdrsNew);
+    hdrs  = (unsigned *) ((unsigned)(hdrs) + KERNEL_SPACE);
+    printf("user code is at 0x%x\n", hdrsNew );
+    printf("boot data is at 0x%x\n", bdNew);
+    // printf("headres data is at 0x%x\n", bdNew->headers + KERNEL_SPACE);
+    // printf("headres data is at 0x%x\n", bdNew->headers);
+    printf("user code is at 0x%x\n", hdrs[9]);
+    initContext(&user, hdrs[9], 0);
+    printf("user is at %x\n", (unsigned)(&user));
+    switchToUser(&user);
 
     printf("-- kernel -- : The kernel will now halt!\n");
     halt();

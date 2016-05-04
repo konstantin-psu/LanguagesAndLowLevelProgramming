@@ -81,6 +81,7 @@ void mapPage(struct Pdir* pdir, unsigned virt, unsigned phys) {
     unsigned dir = maskTo(virt >> SUPERSIZE, 10);
     unsigned ptdir = maskTo(virt >> PAGESIZE, 10);
     unsigned pden = pdir->pde[dir];
+    printf("-- mapPage -- : pden 0x%x\n",pden);
     struct Ptab * newTable = 0x0;
     printf("-- mapPage -- : Current page directory entry 0x%x!!\n", pde);
     if ((pden & 0x81) == 0x81)
