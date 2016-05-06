@@ -26,6 +26,46 @@ void fatal(char* msg) {
 unsigned physStart;  // Set during initialization to start of memory pool
 unsigned physEnd;    // Set during initialization to end of memory pool
 
+/*-------------------------------------------------------------------------
+ * Context data structures: a place holder for when we get back to
+ * context switching ...
+ */
+struct Context user2;
+struct Context user[2];
+struct Context * current;
+
+
+static void tick() {
+  static unsigned totalTicks = 0;
+  totalTicks++;
+  printf("Tick\n");
+  //setWindow(0, 1, 1, 8);   // kernel on left hand side
+  printf("TotalTicks since start %d\n", totalTicks);
+  //setWindow(2, 22, 0, 45);   // kernel on left hand side
+  static unsigned ticks = 0;
+  ticks++;
+  if ((ticks&15)==0) {
+      printf("ContextSwitch\n");
+      current = (current==user) ? (user+1) : user;
+  }
+}
+
+
+void timerInterrupt() {
+  printf("TimerInterrupt\n");
+  maskAckIRQ(TIMERIRQ);
+  enableIRQ(TIMERIRQ);
+  tick();
+  switchToUser(current);
+}
+
+void yieldimp() {
+  printf("Yielding ...");
+  current = (current==user) ? (user+1) : user;
+  switchToUser(current);
+}
+
+
 unsigned* allocPage() {
     //printf("You have not implemented the allocPage() function (yet)!\n");
 
@@ -73,11 +113,6 @@ void mapRegion(struct Pdir* aPdir, unsigned lo, unsigned hi) {
     }
 }
 
-/*-------------------------------------------------------------------------
- * Context data structures: a place holder for when we get back to
- * context switching ...
- */
-struct Context user;
 
 /*-------------------------------------------------------------------------
  * The main "kernel" code:
@@ -240,26 +275,30 @@ void kernel() {
     // hdrsNew = , hdrsNew);
     printf("-- kernel -- : user lo 0x%x user hi 0x%x\n", userLo, userHi);
     mapRegion(newpdir, userLo, userHi);
-    showPdir(newpdir);
 
     printf("user code is at 0x%x\n", hdrsNew);
     hdrs  = (unsigned *) ((unsigned)(hdrs) + KERNEL_SPACE);
     printf("user code is at 0x%x\n", hdrsNew );
     printf("boot data is at 0x%x\n", bdNew);
+    mapRegion(newpdir, hdrs[10], hdrs[11]);
+
+    showPdir(newpdir);
     // printf("headres data is at 0x%x\n", bdNew->headers + KERNEL_SPACE);
     // printf("headres data is at 0x%x\n", bdNew->headers);
     printf("user code is at 0x%x\n", hdrs[9]);
-    initContext(&user, hdrs[9], 0);
-    printf("user is at %x\n", (unsigned)(&user));
-    switchToUser(&user);
+    initContext(user, hdrs[9], 0);
+    initContext(user + 1, hdrs[12], 0);
+    current = user;
+    printf("user is at %x\n", (unsigned)(user));
+    switchToUser(user + 1);
 
     printf("-- kernel -- : The kernel will now halt!\n");
     halt();
 }
 
 void csyscall() {  /* A trivial system call */
-    putchar(user.regs.eax);
-    switchToUser(&user);
+    putchar(current->regs.eax);
+    switchToUser(current);
 }
 
 /*-----------------------------------------------------------------------*/
