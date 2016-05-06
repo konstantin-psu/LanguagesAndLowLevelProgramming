@@ -16,7 +16,7 @@ all: kernel
 #----------------------------------------------------------------------------
 # A simple protected mode kernel that uses paging.
 
-KOBJS	= init.o kernel.o paging.o
+KOBJS	= init.o kernel.o paging.o initpic.o
 kernel: ${KOBJS} kernel.ld
 	$(LD) ${LDDEFS} -T kernel.ld -o kernel ${KOBJS} ${LIBPATH} \
 		--print-map > kernel.map
@@ -25,6 +25,9 @@ kernel: ${KOBJS} kernel.ld
 init.o:		init.S memory.h
 kernel.o:	kernel.c context.h paging.h memory.h
 paging.o:	paging.c paging.h memory.h
+
+initpic.o: init.s
+	$(CC) -Wa,-alsm=initpic.lst -c -o initpic.o initpic.s
 
 .c.o:
 	$(CC) ${CCOPTS} ${INCPATH} ${CCDEFS} -o $*.o -c $*.c

@@ -15,3 +15,12 @@ kputc:	pushl	%eax
 	popl	%eax
 	ret
 
+    .globl yield
+yield:
+    int $0x81
+    ret
+
+    .globl hold
+hold:
+    int $0x82
+    ret

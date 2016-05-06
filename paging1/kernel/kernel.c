@@ -9,6 +9,12 @@
 #include "memory.h"
 #include "hardware.h"
 
+extern void initPIC();
+
+struct Process {
+    struct Context ctxt;
+    struct Pdir*   pdir;
+};
 /*-------------------------------------------------------------------------
  * Basic code for halting the processor and reporting a fatal error:
  */
@@ -30,9 +36,13 @@ unsigned physEnd;    // Set during initialization to end of memory pool
  * Context data structures: a place holder for when we get back to
  * context switching ...
  */
-struct Context user2;
-struct Context user[2];
-struct Context * current;
+// struct Context user2;
+// struct Context user[2];
+// struct Context * current;
+  
+struct Process proc;
+// struct Process proc[2];
+struct Process * current;
 
 
 static void tick() {
@@ -61,7 +71,7 @@ void timerInterrupt() {
 
 void yieldimp() {
   printf("Yielding ...");
-  current = (current==user) ? (user+1) : user;
+  current = (current==proc.ctxt) ? (proc+1) : user;
   switchToUser(current);
 }
 
@@ -124,6 +134,8 @@ void kernel() {
     unsigned  i;
     unsigned int userHi, userLo;
 
+    initPIC();
+    startTimer();
     setAttr(0x2e);
     cls();
     setAttr(7);
@@ -290,7 +302,7 @@ void kernel() {
     initContext(user + 1, hdrs[12], 0);
     current = user;
     printf("user is at %x\n", (unsigned)(user));
-    switchToUser(user + 1);
+    switchToUser(current);
 
     printf("-- kernel -- : The kernel will now halt!\n");
     halt();
