@@ -66,9 +66,9 @@ void mapPage(struct Pdir* pdir, unsigned virt, unsigned phys) {
     // Make sure that the virtual address is in user space.
     if (virt>=KERNEL_SPACE) {
          // printf("KERNEL_SPACE %x virtual address %x\n", KERNEL_SPACE, virt);
-        fatal("virtual address is in kernel space");
+        fatal("-- mapPage -- : virtual address is in kernel space");
     }
-    printf("KERNEL_SPACE %x virtual address %x phys %x\n ", KERNEL_SPACE, virt,phys);
+    printf("-- mapPage -- : KERNEL_SPACE %x virtual address %x phys %x\n ", KERNEL_SPACE, virt,phys);
 
     // TODO: Find the relevant entry in the page directory
 
@@ -81,26 +81,29 @@ void mapPage(struct Pdir* pdir, unsigned virt, unsigned phys) {
     unsigned dir = maskTo(virt >> SUPERSIZE, 10);
     unsigned ptdir = maskTo(virt >> PAGESIZE, 10);
     unsigned pden = pdir->pde[dir];
+    printf("-- mapPage -- : pden 0x%x\n",pden);
     struct Ptab * newTable = 0x0;
-    printf("CUrrent entry 0x%x!!\n", pde);
+    printf("-- mapPage -- : Current page directory entry 0x%x!!\n", pde);
     if ((pden & 0x81) == 0x81)
-        fatal("Address is already mapped (as superpage)");
+        fatal("-- mapPage -- : Address is already mapped (as superpage)");
 
 
     if ((pden & 0x1) == 0) {
+        printf("-- mapPage -- : Creating new table\n");
         newTable = (struct Ptab *) allocPage();
     } else {
         newTable = fromPhys(struct Ptab *, alignTo(pdir->pde[dir],PAGESIZE));
         if ((newTable->pte[ptdir] && 0x1)) {
-            fatal("Page is already mapped");
+            fatal("-- mapPage -- : Page is already mapped");
         }
     }
+    printf("-- mapPage -- : New table is at 0x%x!!\n", newTable);
     pdir->pde[dir] = toPhys(newTable) | PERMS_USER_RW;
-    printf("Current entry 0x%x!!\n", pdir->pde[dir]);
+    printf("-- mapPage -- : Current page table entry 0x%x!!\n", pdir->pde[dir]);
 
     //newTable = (struct Ptab*)toPhys(newTable);
     newTable->pte[ptdir] = phys | PERMS_USER_RW;
-    printf("New entry index %d\n", ptdir);
+    printf("-- mapPage -- : New entry index %d\n", ptdir);
 
 
     // fromPhys(struct Ptab*, alignTo(pde, PAGESIZE));
@@ -124,7 +127,7 @@ void mapPage(struct Pdir* pdir, unsigned virt, unsigned phys) {
  * Print a description of a page directory (for debugging purposes).
  */
 void showPdir(struct Pdir* pdir) {
-  printf("  Page directory at %x\n", pdir);
+  printf("  -- shoPdir -- : Page directory at %x\n", pdir);
   for (unsigned i=0; i<1024; i++) {
     if (pdir->pde[i]&1) {
       if (pdir->pde[i]&0x80) {
