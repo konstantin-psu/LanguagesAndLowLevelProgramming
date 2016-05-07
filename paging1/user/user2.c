@@ -1,12 +1,9 @@
 /* A simple program that we will run in user mode.
  */
-#include "simpleio.h"
+#include "userio.h"
 
 extern void kputc(unsigned);
-extern void yield(void);
 extern void hold(void);
-
-unsigned * flagAddr = (unsigned *)0x4026a0;
 
 void kputs(char* s) {
   while (*s) {
@@ -15,15 +12,19 @@ void kputs(char* s) {
 }
 
 void cmain() {
-  int i;
-  setWindow(13, 11, 47, 32);   // user process on right hand side
+  int i,j,k;
+  int max = 600;
+  setAttr(0xa1);
+  //setWindow(13, 11, 47, 32);   // user process on right hand side
   cls();
-  printf("flagAddr = 0x%x\n", flagAddr);
-  *flagAddr = 1234;
   puts("in user2 code\n");
-  for (i=0; i<600; i++) {
+  for (i=0; i<max; i++) {
+    for (j=0; j<max*max; j++) {
+        for (k=0; k<max; k++) { 
+        }
+    }
     kputs("hello, kernel2 console\n");
-    puts("hello, user2 console\n");
+    printf("%d hello, user2 console %d\n", i, 600 - i);
   }
   puts("\n\nUser2 code does not return\n");
   //yield();

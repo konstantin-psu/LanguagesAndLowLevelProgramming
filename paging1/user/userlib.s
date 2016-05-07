@@ -15,12 +15,18 @@ kputc:	pushl	%eax
 	popl	%eax
 	ret
 
-    .globl yield
-yield:
-    int $0x81
-    ret
-
     .globl hold
 hold:
-    int $0x82
+    int $132
     ret
+
+
+#-------------------------------------------------------------------------
+# Set the video color attribute.
+
+#         .globl  setAttr
+# setAttr:pushl   %eax
+#         mov     8(%esp), %eax
+#         int     $0x82
+#         popl    %eax
+#         ret

@@ -294,9 +294,11 @@ initIDT:# Add descriptors for exception & interrupt handlers:
         # These are the only idt entries that we will allow to be called from
         # user mode without generating a general protection fault, so they
         # will be tagged with dpl=3
-	idtcalc	handler=syscall, slot=0x80, dpl=3
-	idtcalc	handler=yieldimp, slot=0x81, dpl=3
-	idtcalc	handler=handlecall, slot=0x82, dpl=3
+	idtcalc	handler=syscall, slot=128, dpl=3
+	idtcalc	handler=putchar, slot=129, dpl=3
+	idtcalc	handler=ccls, slot=130, dpl=3
+	idtcalc	handler=setAttr, slot=131, dpl=3
+	idtcalc	handler=handlecall, slot=132, dpl=3
 
 	idtcalc	handler=timerHandler, slot=0x20, dpl=0
 	# Install the new IDT:
@@ -356,7 +358,9 @@ nohandler:			# dummy interrupt handler
 	pushl	%ebx
 	pushl	%eax
 	pushl	$excepted
-	call	printf
+    pushl   $console      # add the extra argument
+    call    wprintf       # call the new function
+	# call	printf
 	addl	$12, %esp
 
 1:	hlt
@@ -411,6 +415,15 @@ syscall:subl	$4, %esp	# Fake an error code
 	leal	stack, %esp	# Switch to kernel stack
 	jmp	csyscall
 
+putchar:subl	$4, %esp	# Fake an error code
+	push	%gs		# Save segments
+	push	%fs
+	push	%es
+	push	%ds
+	pusha			# Save registers
+	leal	stack, %esp	# Switch to kernel stack
+	jmp	cputchar
+
 handlecall:
     hlt
     jmp handlecall
@@ -424,6 +437,15 @@ timerHandler:
         pusha
         leal    stack, %esp
         jmp     timerInterrupt
+
+setAttr:subl	$4, %esp	# Fake an error code
+	push	%gs		# Save segments
+	push	%fs
+	push	%es
+	push	%ds
+	pusha			# Save registers
+	leal	stack, %esp	# Switch to kernel stack
+	jmp	csetAttr
 #--------------------------------------------------------------------------
 # Switch to user mode:  Takes a single parameter, which provides the
 # initial context for the user process.
