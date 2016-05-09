@@ -1,0 +1,166 @@
+\documentclass{article}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage[plain]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumerate}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{forest}
+\usepackage[shortlabels]{enumitem}
+\setlist[enumerate, 1]{1\textsuperscript{o}}
+\lstset { %
+    language=C++,
+        backgroundcolor=\color{black!5}, % set backgroundcolor
+            basicstyle=\footnotesize,% basic font setting
+}
+
+%\usetikzlibrary{automata,positioning}
+\usetikzlibrary{positioning,shapes,shadows,arrows,automata}
+
+%
+% Basic Document Settings
+%
+
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1}
+
+\pagestyle{fancy}
+\lhead{\hmwkAuthorName}
+\rhead{ (\hmwkClassInstructor\ \hmwkClassTime): \hmwkTitle}
+\lfoot{\lastxmark}
+\cfoot{\thepage}
+
+\renewcommand\headrulewidth{0.4pt}
+\renewcommand\footrulewidth{0.4pt}
+
+\setlength\parindent{0pt}
+
+\setcounter{secnumdepth}{0}
+\newcounter{partCounter}
+
+
+\newcommand{\hmwkTitle}{Portfolio submission, Topic 6}
+\newcommand{\hmwkDueDate}{May 13, 2016}
+\newcommand{\hmwkClass}{CS510 Languages and Low Level Programming}
+\newcommand{\hmwkClassTime}{Spring 2016}
+\newcommand{\hmwkClassInstructor}{Mark P. Jones}
+\newcommand{\hmwkAuthorName}{Konstantin Macarenco}
+
+
+\title{
+    \vspace{2in}
+    \textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+        \normalsize\vspace{0.1in}\small{Due\ on\ \hmwkDueDate\ at 11:59pm}\\
+        \vspace{0.1in}\large{\textit{\hmwkClassInstructor\ \hmwkClassTime}}
+    \vspace{3in}
+}
+
+\author{\textbf{\hmwkAuthorName}}
+\date{}
+
+\renewcommand{\part}[1]{\textbf{\large Part \Alph{partCounter}}\stepcounter{partCounter}\\}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+%\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
+\section{Topic 6.}  Describe the motivation, implementation, and application of microkernel
+abstractions for managing address spaces, threads, and interprocess communication (IPC). \\
+
+             \subsection{Motivation}
+             %STARTSTART
+             Idea behind microkernel is to provide ``policy free'' environment, with no assumptions about
+             services it will be running. All functionality of a traditional kernel is moved out, and
+             implemented as a set of independent services. Microkernel provides only minimum set of
+             abstraction over hardware, such as
+             \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
+    \item Address Spacing
+\item Inter-process Communication (IPC)
+    \item Thread Management
+    \item Unique Identifiers
+    \end{enumerate}
+    Systems that use this approach will implement only the functionality needs to operate, have
+    smaller footprint. All nonessential for the kernel functions, like network support, are
+    implemented as services. Each service has it's own address space, communication with other
+    services allowed only through Only kernel functionality is in privileged mode (ring 0). 
+    \vspace{0.2cm}
+
+    Advantages
+    \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
+    \item Robustness, a service crash doesn't affect any other part of the system.
+    \item Easier maintenance.
+    \item Enforces modular structure.
+    \item Small size of Trusted Computing Base.
+    \end{enumerate}
+    \vspace{0.2cm}
+
+    Disadvantages
+    \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
+    \item Performance loss due to high overhead of services interaction.
+    \item Larger memory footprint.
+    \item Complicated process management.
+    \end{enumerate}
+
+    \subsection{Implementation}
+    \textbf{History}\\
+
+    Mach\\
+
+    L3\\
+
+    L4\\
+
+    \textbf{Implementation details}
+    \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
+    \item Userspace perspective \\
+        Kernel Information Page (kernel version, host system info, address space layout
+        info, system call entry points)
+        
+        Predefined KIP adddress
+
+        Slow system call LOCK NOP -> illegal opcode exception -> kernel -> load KIP address
+        to context registers -> return to user mode
+        \\ 
+        and User Thread COntorl Block (One UTCB for eac thread) in the address space
+         Message registers (MRs), and thread control registers (TCRs) 
+
+         all UTCBs are in UTCB area
+
+         64 message registers $MR_0 - MR_63$
+
+         Miscellaneous fields: error code, exceptin handler pager acceptor
+         
+         UTCB address  points to the middle of the UTCB \\
+
+         User processes can read/write data to any UTCB available
+
+         thread priority is stored in protected structure, any data read form UTCB cannot be
+         trusted and must  be validated by the kernel before use.
+
+         UTCB mappings created by kernel
+
+
+
+    \end{enumerate}
+
+    %ENDEND
+
+
+    \subsection{Application}
+    \end{document}

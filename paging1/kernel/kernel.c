@@ -212,7 +212,7 @@ void kernel() {
     setAttr(0x2e);
     setWindow(0, 22, 0, 45);   // kernel on left hand side
     wsetWindow(&timerWin, 22, 2, 0, 45); // process 0 upper right
-    wsetAttr(&timerWin, 0x5f);
+    wsetAttr(&timerWin, 0x1f);
     struct Pdir * newPdir;
     setVideo(KERNEL_SPACE+0xb8000);
     cls();

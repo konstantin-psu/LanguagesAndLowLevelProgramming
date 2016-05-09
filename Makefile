@@ -11,23 +11,31 @@ include Makefile.common
 BOOT = paging1
 
 all:	libs
-	make -C ${BOOT}
+	make -C hello
+	make -C bootinfo
+	make -C example-mimg
+	make -C example-gdt
+	make -C example-idt
+	make -C paging1
 
 run:	libs
 	make -C ${BOOT} run
 
 all_targets: libs
 	make -C hello
-	make -C simpleio
 	make -C bootinfo
-	make -C mimg
 	make -C example-mimg
 	make -C example-gdt
 	make -C example-idt
 	make -C paging1
+	make -C pork
+
 
 libs:
 	make -C simpleio
+	make -C mimg
+	make -C winio
+	make -C userio
 	make -C mimg
 
 clean:
@@ -39,5 +47,8 @@ clean:
 	make -C example-gdt        clean
 	make -C example-idt        clean
 	make -C paging1            clean
+	make -C winio              clean
+	make -C userio             clean
+	make -C pork               clean
 
 #----------------------------------------------------------------------------
