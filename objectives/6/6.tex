@@ -113,10 +113,12 @@ abstractions for managing address spaces, threads, and interprocess communicatio
     Disadvantages
     \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
     \item Performance loss due to high overhead of services interaction.
-    \item Larger memory footprint.
-    \item Complicated process management.
-    \end{enumerate}
+    \item Larger memory footprint.  \item Complicated process management.  \end{enumerate}
 
+    Earlier versions of microkernel implementation suffered from high IPC overhead and
+    did not look promising. L3/L4 (Jochen Liedtke) implementation proved that microkernel can be successful.
+    Liedtke IPC design was 20 times faster than Mach's (fist generation of microkernel).
+    
     \subsection{Implementation}
     \textbf{History}\\
 
@@ -127,15 +129,15 @@ abstractions for managing address spaces, threads, and interprocess communicatio
     L4\\
 
     \textbf{Implementation details}
-    \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
-    \item Userspace perspective \\
+    \begin{enumerate}[1., leftmargin = 0.7cm, nosep]
+    \item \textbf{Thread Management}\\
         Kernel Information Page (kernel version, host system info, address space layout
         info, system call entry points)
         
         Predefined KIP adddress
 
-        Slow system call LOCK NOP -> illegal opcode exception -> kernel -> load KIP address
-        to context registers -> return to user mode
+        Slow system call LOCK NOP $\rightarrow$ illegal opcode exception $\rightarrow$ kernel $\rightarrow$ load KIP address
+        to context registers $\rightarrow$ return to user mode
         \\ 
         and User Thread COntorl Block (One UTCB for eac thread) in the address space
          Message registers (MRs), and thread control registers (TCRs) 
@@ -154,6 +156,10 @@ abstractions for managing address spaces, threads, and interprocess communicatio
          trusted and must  be validated by the kernel before use.
 
          UTCB mappings created by kernel
+
+    \item Address Spacing
+
+    \item Inter-process Communication (IPC)
 
 
 
