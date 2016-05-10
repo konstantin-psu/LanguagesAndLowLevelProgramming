@@ -13,7 +13,7 @@ void kputs(char* s) {
 
 void cmain() {
   int i,j,k;
-  int max = 600;
+  int max = 300;
   setAttr(0xa1);
   //setWindow(13, 11, 47, 32);   // user process on right hand side
   cls();
@@ -23,8 +23,8 @@ void cmain() {
         for (k=0; k<max; k++) { 
         }
     }
-    kputs("hello, kernel2 console\n");
-    printf("%d hello, user2 console %d\n", i, 600 - i);
+    // kputs("hello, kernel2 console\n");
+    printf("%d hello, user2 console\n", i);
   }
   puts("\n\nUser2 code does not return\n");
   //yield();

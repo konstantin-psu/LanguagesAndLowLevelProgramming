@@ -9,6 +9,8 @@
 #include "memory.h"
 #include "hardware.h"
 
+#define DEBUG 0
+
 extern void initPIC();
 
 struct Process {
@@ -42,41 +44,45 @@ unsigned physEnd;    // Set during initialization to end of memory pool
  * Context data structures: a place holder for when we get back to
  * context switching ...
  */
-  
+
 struct Process proc[2];
 struct Process * current;
-struct Window timerWin;
+// struct Window timerWin;
 
 
 static void tick() {
-  static unsigned totalTicks = 0;
-  totalTicks++;
-  // puts(&timerWin, "Tick");
-  // puts("Tick\n");
-  // setWindow(0, 1, 1, 8);   // kernel on left hand side
-  // printf("TotalTicks since start %d\n", totalTicks);
-  wprintf(&timerWin, "TotalTicks since start %d\n", totalTicks);
-  //setWindow(2, 22, 0, 45);   // kernel on left hand side
-  static unsigned ticks = 0;
-  ticks++;
-  if ((ticks&15)==0) {
-      //printf("ContextSwitch\n");
-      current = (current==proc) ? (proc+1) : proc;
-  }
+    static unsigned totalTicks = 0;
+    totalTicks++;
+    // puts(&timerWin, "Tick");
+    // puts("Tick\n");
+    // setWindow(0, 1, 1, 8);   // kernel on left hand side
+    printf(".");
+    if (DEBUG) {
+        printf("TotalTicks since start %d\n", totalTicks);
+        // wprintf(&timerWin, "TotalTicks since start %d\n", totalTicks);
+    }
+    //setWindow(2, 22, 0, 45);   // kernel on left hand side
+    static unsigned ticks = 0;
+    ticks++;
+    if ((ticks&15)==0) {
+        //printf("ContextSwitch\n");
+        current = (current==proc) ? (proc+1) : proc;
+    }
 }
 
 
 void switchToProcess(struct Process * currentL) {
-  setPdir(toPhys(currentL->pdir));
-  switchToUser(&(currentL->ctxt));
+    setPdir(toPhys(currentL->pdir));
+    switchToUser(&(currentL->ctxt));
 }
 
 void timerInterrupt() {
-  maskAckIRQ(TIMERIRQ);
-  enableIRQ(TIMERIRQ);
-  tick();
-  //printf("TimerInterrupt\n");
-  switchToProcess(current);
+    maskAckIRQ(TIMERIRQ);
+    enableIRQ(TIMERIRQ);
+    tick();
+    if (DEBUG)
+        printf("TimerInterrupt\n");
+    switchToProcess(current);
 }
 
 unsigned* allocPage() {
@@ -92,10 +98,12 @@ unsigned* allocPage() {
         fatal("-- allocPage -- : not enough space left");
     }
 
-    printf("-- allocPage -- : starting search trough the available memory\n");
+    if (DEBUG)
+        printf("-- allocPage -- : starting search trough the available memory\n");
     physStart = pageNext(physStart);   // advance physStart
     size = 0x1000;
-    printf("-- allocPage -- : allocating at 0x%x physstart at %x\n",pdir, physStart);
+    if (DEBUG)
+        printf("-- allocPage -- : allocating at 0x%x physstart at %x\n",pdir, physStart);
     for (i = 0; i < 1024; i++) {
         pdir->pde[i] = 0;
         //*(unsigned *)(r + i)  = 0x0;
@@ -122,7 +130,8 @@ unsigned copyRegion(unsigned lo, unsigned hi) {
     // Check that lo<hi, and take appropriate steps to
     // ensure that lo and hi correspond to suitable page
     // boundaries.
-    printf("-- kernel  copyRegion -- : copying region: [0x%x 0x%x]\n", lo, hi);
+    if (DEBUG)
+        printf("-- kernel  copyRegion -- : copying region: [0x%x 0x%x]\n", lo, hi);
     if (lo >= hi) {
         fatalKernel("copyRegion", "hi must be less than lo");
     }
@@ -142,14 +151,17 @@ unsigned copyRegion(unsigned lo, unsigned hi) {
     unsigned * hiVirt = (unsigned *)(hi + KERNEL_SPACE);
     unsigned * loVirt = (unsigned *)(lo + KERNEL_SPACE);
 
-    printf("-- kernel  copyRegion -- : physical 0x%x virtual 0x%x\n", physStart, physVirt);
-    printf("-- kernel  copyRegion -- : copying region (IN KERNEL SPACE): [0x%x 0x%x]\n", loVirt, hiVirt);
+    if (DEBUG) {
+        printf("-- kernel  copyRegion -- : physical 0x%x virtual 0x%x\n", physStart, physVirt);
+        printf("-- kernel  copyRegion -- : copying region (IN KERNEL SPACE): [0x%x 0x%x]\n", loVirt, hiVirt);
+    }
     while (hiVirt > loVirt) {
         *physVirt = *loVirt;
         loVirt += 1;
         physVirt +=1;
     }
-    printf("-- kernel  copyRegion -- : Copying DONE\n");
+    if (DEBUG)
+        printf("-- kernel  copyRegion -- : Copying DONE\n");
 
     // Update physStart as necessary.
     hiVirt = (unsigned *) physStart;
@@ -157,7 +169,8 @@ unsigned copyRegion(unsigned lo, unsigned hi) {
 
     // Return the physical address of the start of the
     // region where the new copy was placed.
-    printf("-- kernel  copyRegion -- : EXIT: new physStart 0x%x new Copied region 0x%x\n", physStart, hiVirt);
+    if (DEBUG)
+        printf("-- kernel  copyRegion -- : EXIT: new physStart 0x%x new Copied region 0x%x\n", physStart, hiVirt);
     return (unsigned)hiVirt;
 }
 
@@ -172,7 +185,8 @@ struct Pdir* newUserPdir(unsigned lo, unsigned hi) {
     // Add mappings to ensure that the region between lo and
     // hi in the new address space is mapped to the appropriate
     // portions of the pages starting at address phys.
-    printf("--kernel newUserPdir -- : Mapping new user directory\n");
+    if (DEBUG)
+        printf("--kernel newUserPdir -- : Mapping new user directory\n");
 
     while (lo < hi) {
         mapPage(pdir, lo, phys);
@@ -192,7 +206,8 @@ void initProcess(struct Process* proc, unsigned lo, unsigned hi, unsigned entry)
 }
 
 void mapRegion(struct Pdir* aPdir, unsigned lo, unsigned hi) {
-    printf("--kernel mapRegion -- : Entry\n");
+    if (DEBUG)
+        printf("--kernel mapRegion -- : Entry\n");
     while (lo < hi) {
         mapPage(aPdir, lo, lo);
         lo = pageNext(lo);
@@ -210,15 +225,16 @@ void kernel() {
     unsigned  i;
 
     setAttr(0x2e);
-    setWindow(0, 22, 0, 45);   // kernel on left hand side
-    wsetWindow(&timerWin, 22, 2, 0, 45); // process 0 upper right
-    wsetAttr(&timerWin, 0x1f);
+    setWindow(2, 22, 1, 44);   // kernel on left hand side
+    // wsetWindow(&timerWin, 22, 2, 0, 45); // process 0 upper right
+    // wsetAttr(&timerWin, 0x1f);
     struct Pdir * newPdir;
     setVideo(KERNEL_SPACE+0xb8000);
     cls();
     setAttr(7);
     cls();
-    printf(" -- kernel -- : Paging kernel has booted!\n");
+    if (DEBUG)
+        printf(" -- kernel -- : Paging kernel has booted!\n");
 
     printf(" -- kernel -- : Headers:\n");
     for (i=0; i<hdrs[0]; i++) {
@@ -232,15 +248,19 @@ void kernel() {
                 i, mmap[2*i+1], mmap[2*i+2]);
     }
 
-    printf("-- kernel -- :Strings:\n");
-    printf("-- kernel -- : cmdline: %s [%x]\n", bd->cmdline, bd->cmdline);
-    printf("-- kernel -- : imgline: %s [%x]\n", bd->imgline, bd->imgline);
+    if (DEBUG) {
+        printf("-- kernel -- :Strings:\n");
+        printf("-- kernel -- : cmdline: %s [%x]\n", bd->cmdline, bd->cmdline);
+        printf("-- kernel -- : imgline: %s [%x]\n", bd->imgline, bd->imgline);
+    }
 
     extern struct Pdir initdir[];
-    printf("-- kernel -- : initial page directory is at 0x%x\n", initdir);
+    if (DEBUG)
+        printf("-- kernel -- : initial page directory is at 0x%x\n", initdir);
     showPdir(initdir);
 
-    printf("-- kernel -- : kernel code is at 0x%x\n", kernel);
+    if (DEBUG)
+        printf("-- kernel -- : kernel code is at 0x%x\n", kernel);
 
     // TODO: Scan the memory map to find the biggest region of
     // available pages subject to the constraints:
@@ -255,8 +275,10 @@ void kernel() {
 
     unsigned test = KERNEL_LOAD;
     unsigned phmap = PHYSMAP;
-    printf("-- kernel -- : KERNEL_LOAD 0x%x\n", test);
-    printf("-- kernel -- : PHYSMAP 0x%x\n", phmap);
+    if (DEBUG) {
+        printf("-- kernel -- : KERNEL_LOAD 0x%x\n", test);
+        printf("-- kernel -- : PHYSMAP 0x%x\n", phmap);
+    }
     unsigned max = 0;
     unsigned prev = 0;
     // TODO: Remove the following halt() call once you are
@@ -265,18 +287,21 @@ void kernel() {
         if (mmap[2*i+1] >= KERNEL_LOAD && !(maskTo(mmap[2*i+2],12) ^ 0xfff)) {
             max = mmap[2*i+2] - mmap[2*i+1] > prev ? i  : max;
             prev = mmap[2*max+2] - mmap[2*max+1];
-            printf("-- kernel -- : %d %x %x max %d diff %x\n",i, mmap[2*i+2], mmap[2*i+1], max, mmap[2*i+2] - mmap[2*i+1]);
+            if (DEBUG)
+                printf("-- kernel -- : %d %x %x max %d diff %x\n",i, mmap[2*i+2], mmap[2*i+1], max, mmap[2*i+2] - mmap[2*i+1]);
         }
     }
     physStart = mmap[max*2+1];
     physEnd = mmap[max*2+2];
-    printf("-- kernel -- : physStart so far %x, physEnd so far %x\n", physStart, physEnd);
+    if (DEBUG)
+        printf("-- kernel -- : physStart so far %x, physEnd so far %x\n", physStart, physEnd);
 
     // TODO: Report a fatal error if there is no suitable region
     // of memory.
 
     if (!max) {
-        printf("-- kernel -- : FATAL ERROR: no suitable region of memory found\n");
+        if (DEBUG)
+            printf("-- kernel -- : FATAL ERROR: no suitable region of memory found\n");
         halt();
     }
 
@@ -302,10 +327,12 @@ void kernel() {
             while (startPage < overlapEnd) 
                 startPage = pageNext(startPage);
             physStart = startPage;
-            printf("-- kernel -- : physStart %x, physEnd %x gapSize %d gapLocationStart %x \n",
-                    physStart, physEnd, gapSize, gapLocationStart);
-            printf("-- kernel -- : header[%d]: [%x-%x], entry %x\n",
-                    i, hdrs[3*i+1], hdrs[3*i+2], hdrs[3*i+3]);
+            if (DEBUG) {
+                printf("-- kernel -- : physStart %x, physEnd %x gapSize %d gapLocationStart %x \n",
+                        physStart, physEnd, gapSize, gapLocationStart);
+                printf("-- kernel -- : header[%d]: [%x-%x], entry %x\n",
+                        i, hdrs[3*i+1], hdrs[3*i+2], hdrs[3*i+3]);
+            }
         }
     }
 
@@ -322,8 +349,9 @@ void kernel() {
     // region, as well as the total number of bytes that it
     // contains.
 
-    printf("-- kernel -- : Will allocate from region [%x-%x], %d bytes\n",
-            physStart, physEnd, (1 + physEnd - physStart));
+    if (DEBUG)
+        printf("-- kernel -- : Will allocate from region [%x-%x], %d bytes\n",
+                physStart, physEnd, (1 + physEnd - physStart));
 
     // Now we will build a new page directory:
     newPdir = allocPdir();
@@ -346,16 +374,17 @@ void kernel() {
 
     // TODO: reinstate the following code ... but we'll get to that
     // next time!
-    
+
 
     hdrs  = (unsigned *) ((unsigned)(hdrs) + KERNEL_SPACE);
 
     showPdir(newPdir);
-    
+
     initProcess(proc,hdrs[7], hdrs[8], hdrs[9]);
     initProcess(proc + 1,hdrs[10], hdrs[11], hdrs[12]);
 
-    printf("-- kernel kernel -- : new process page directory \n");
+    if (DEBUG)
+        printf("-- kernel kernel -- : new process page directory \n");
     showPdir(proc[0].pdir);
     showPdir(proc[1].pdir);
 
@@ -365,14 +394,16 @@ void kernel() {
     wsetWindow(&proc[1].win, 13, 11, 47, 32);// process 1 lower right
     wsetAttr(&proc[1].win, 4);               // red output
 
-    printf("-- kernel kernel -- : user code is at 0x%x\n", hdrs[9]);
+    if (DEBUG)
+        printf("-- kernel kernel -- : user code is at 0x%x\n", hdrs[9]);
     current = proc + 1;
 
     initPIC();
     startTimer();
     switchToProcess(current);
 
-    printf("-- kernel kernel -- : The kernel will now halt!\n");
+    if (DEBUG)
+        printf("-- kernel kernel -- : The kernel will now halt!\n");
     halt();
 }
 
