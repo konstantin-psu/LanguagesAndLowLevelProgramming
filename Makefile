@@ -52,5 +52,8 @@ clean:
 	make -C winio              clean
 	make -C userio             clean
 	make -C pork               clean
+	make -C pork               clean
+	make -C capio              clean
+	make -C caps               clean
 
 #----------------------------------------------------------------------------

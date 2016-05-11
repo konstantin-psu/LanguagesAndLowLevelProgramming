@@ -95,22 +95,28 @@ void syscallPutchar() {
 
 void syscallCls() {
   struct WindowCap* wcap = getWindowCap();
-  // TODO: complete implementation for this function:
+  // TOUNDO: complete implementation for this function:
   // do not allow the window to be cleared unless the
   // invoking process has specified a valid WindowCap
   // with CAN_cls permission.  The capability number
   // will be specified in the ecx register.
+  if (wcap && (wcap->perms & CAN_cls)) {
+    wcls(wcap->window);
+  }
   switchToUser(&current->ctxt);
 }
 
 void syscallSetAttr() {
   struct WindowCap* wcap = getWindowCap();
-  // TODO: complete implementation for this function
+  // TOUNDO: complete implementation for this function
   // do not allow the window to be cleared unless the
   // invoking process has specified a valid WindowCap
   // with CAN_setAttr permission.  The capability number
   // will be specified in the ecx register, while the
   // value in eax determines the new attribute.
+  if (wcap && (wcap->perms & CAN_setAttr)) {
+    wcls(wcap->window);
+  }
   switchToUser(&current->ctxt);
 }
 
@@ -161,6 +167,7 @@ void syscallCapclear() {
   // it will be set to NullCap and the value 1 will be
   // returned in eax.  If the operation is not permitted
   // then the return code will be zero.
+  struct Cap*     src  = getCap(ctxt->regs.esi);
   switchToUser(ctxt);
 }
 
