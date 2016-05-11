@@ -45,8 +45,6 @@ void wsetWindow(struct Window* win, int t, int h, int l, int w) {
     win->bottom = t+h;
     win->left   = l;
     win->right  = l+w;
-    win->ypos   = win->top;
-    win->xpos   = win->left;
   }
 }
 
@@ -166,7 +164,6 @@ void wprintf(struct Window* win, const char *format, ...) {
             int padChar  = ' ';
             int padWidth = 0;
             int longArg  = 0;
-            int sizeArg  = 0;
 
             c = *format++;
             if (c == '0') {
@@ -186,31 +183,15 @@ void wprintf(struct Window* win, const char *format, ...) {
                 c = *format++;
             }
 
-            if (c == 'z') {
-                sizeArg = 1;
-                c = *format++;
-            }
-
             switch (c) {
                 case 'd' :
                 case 'u' :
-                case 'x' : {
-                    long num = longArg ? *((long*)arg++)
-                                       : (long)(*((int*)arg++));
-                    char sfx = 'B';
-                    if (sizeArg && num) {
-                      if (((num>>30)<<30)==num) {
-                        num >>= 30;
-                        sfx   = 'G';
-                      } else if (((num>>20)<<20)==num) {
-                        num >>= 20;
-                        sfx   = 'M';
-                      } else if (((num>>10)<<10)==num) {
-                        num >>= 10;
-                        sfx   = 'K';
-                      }
+                case 'x' :
+                    if (longArg) {
+                      itoa(buf, c, *((long*)arg++));
+                    } else {
+                      itoa(buf, c, (long)(*((int*)arg++)));
                     }
-                    itoa(buf, c, num);
                     for (p = buf; *p; p++) {
                       padWidth--;
                     }
@@ -220,11 +201,7 @@ void wprintf(struct Window* win, const char *format, ...) {
                     for (p = buf; *p; p++) {
                         wputchar(win, *p);
                     }
-                    if (sizeArg && sfx!='B') {
-                        wputchar(win, sfx);
-                    }
                     break;
-                }
 
 		case 'c' :
 		    wputchar(win, *((char*) arg++));
