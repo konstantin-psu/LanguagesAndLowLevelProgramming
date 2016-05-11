@@ -8,7 +8,7 @@ include Makefile.common
 #BOOT = example-mimg
 #BOOT = example-gdt
 #BOOT = example-idt
-BOOT = paging1
+BOOT = caps
 
 all:	libs
 	make -C hello
@@ -29,6 +29,7 @@ all_targets: libs
 	make -C example-idt
 	make -C paging1
 	make -C pork
+	make -C caps
 
 
 libs:
@@ -37,6 +38,7 @@ libs:
 	make -C winio
 	make -C userio
 	make -C mimg
+	make -C capio
 
 clean:
 	make -C hello              clean
