@@ -14,6 +14,37 @@
 
 #define DEBUG 1
 
+void mapPageTable(struct Pdir* pdir, unsigned virt, unsigned phys) {
+  // Mask out the least significant 12 bits of virt and phys.
+  virt = alignTo(virt, PAGESIZE);
+  phys = alignTo(phys, PAGESIZE);
+
+  // Make sure that the virtual address is in user space.
+  if (virt>=KERNEL_SPACE) {
+    fatal("virtual address is in kernel space");
+  }
+
+  // Find the relevant entry in the page directory
+  unsigned dir = maskTo(virt >> SUPERSIZE, 10);
+  unsigned pde = pdir->pde[dir];
+
+  // Report a fatal error if there is already a
+  // superpage mapped at that address (this shouldn't
+  // be possible at this stage, but we're programming
+  // defensively).
+  if ((pde&0x81)==0x81) {
+    fatal("Address is already mapped (as a superpage)");
+  }
+
+  // Which page table entry do we want?
+  struct Ptab* ptab;
+  unsigned idx = maskTo(virt >> PAGESIZE, 10);
+  if ((pde&1)==0) {  // page table not present; make a new one!
+    ptab = allocPtab();
+    pdir->pde[dir] = toPhys(ptab) | PERMS_USER_RW;
+  } 
+}
+
 /*-------------------------------------------------------------------------
  * System call to dump current status data for the invoking thread in the
  * console window.
@@ -45,6 +76,20 @@ static unsigned isMapped(struct Pdir* pdir, unsigned virt) {
         }
     }
     return 1;
+}
+
+static unsigned isTableMapped(struct Pdir* pdir, unsigned virt) {
+    virt = alignTo(virt, PAGESIZE);
+    if (virt<KERNEL_SPACE) {
+        unsigned dir = maskTo(virt >> SUPERSIZE, 10);
+        unsigned pde = pdir->pde[dir];
+        if ((pde&1)==0) {                 // directory entry not in use
+            return 0;
+        } else {       // not mapped to a superpage
+            return 1; 
+        }
+    }
+    return 0;
 }
 
 void syscallKmapPage() {
@@ -337,28 +382,36 @@ void syscallMapPage() {
     // are not zero.  A return code of 1 (success) or 0 (error)
     // should be produced as normal.
 
-    // struct PageCap* pcap = getPageCap();
-    // unsigned addr = ctxt->regs.eax;
-    // struct Cap*        cap  = getCap(ctxt->regs.edi);
-    // void*              obj;
-    // printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
-    // printf("**syscall.c** --syscallMapPage-- : current pdir");
-    // showPdir(current->pdir);
-    // // printf("**syscall.c** --shscallAllocPage-- : current cpaces");
-    // // showCspace(current->cspace);
-    // if (pcap &&                        // valid untyped capability
-    //         cap  && isNullCap(cap) &&      // empty destination slot
-    //         (obj=alloc(pcap, PAGESIZE))) { // object allocation succeeds
-    //     pageTableCap(cap, (struct PageTableCap*)obj);
-    //     // printf("**syscall.c** --shscallAllocPage-- : page allocated");
-    //     // printf("**syscall.c** --shscallAllocPage-- : cpaces agter page allocated");
-    //     //showCspace(current->cspace);
-    //     printf("**syscall.c** --syscallMapPage-- : SUCCESS\n");
-    //     ctxt->regs.eax = 1;
-    // } else {
-    //     printf("**syscall.c** --syscallMapPage-- : FAIL\n");
-    //     ctxt->regs.eax = 0;
-    // }
+    struct PageCap* pcap = getPageCap();
+    unsigned addr = ctxt->regs.eax;
+    struct Cap*        cap  = getCap(ctxt->regs.edi);
+    void*              obj;
+
+    if (DEBUG)
+        printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
+    if (DEBUG)
+        printf("**syscall.c** --syscallMapPage-- : current pdir");
+    showPdir(current->pdir);
+    // printf("**syscall.c** --shscallAllocPage-- : current cpaces");
+    //
+      
+      
+      
+      
+      
+    unsigned * page;
+    if (DEBUG)
+        printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
+    if (isTableMapped(current->pdir, addr) && (page=allocPage())) {
+        if (DEBUG)
+            printf("**syscall.c** --syscallMapPage-- : Page table for 0x%x doesn't exists, creating new page table\n", addr);
+        mapPage(current->pdir, addr, toPhys(page));
+        printf("**syscall.c** --syscallMapPage-- : SUCCESS\n");
+        ctxt->regs.eax = 1;
+    } else {
+        printf("**syscall.c** --syscallMapPage-- : FAIL\n");
+        ctxt->regs.eax = 0;
+    }
     switchToUser(ctxt);
 }
 
@@ -381,24 +434,33 @@ void syscallMapPageTable() {
     unsigned addr = ctxt->regs.eax;
     struct Cap*        cap  = getCap(ctxt->regs.edi);
     void*              obj;
-    printf("**syscall.c** --syscallMapPageTable-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
-    printf("**syscall.c** --syscallMapPageTable-- : current pdir");
+    if (DEBUG)
+        printf("**syscall.c** --syscallMapPageTable-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
+    if (DEBUG)
+        printf("**syscall.c** --syscallMapPageTable-- : current pdir");
     showPdir(current->pdir);
     // printf("**syscall.c** --shscallAllocPage-- : current cpaces");
-    // showCspace(current->cspace);
-    if (pcap &&                        // valid untyped capability
-            cap  && isNullCap(cap) &&      // empty destination slot
-            (obj=alloc(pcap, PAGESIZE))) { // object allocation succeeds
-        pageTableCap(cap, (struct PageTableCap*)obj);
-        // printf("**syscall.c** --shscallAllocPage-- : page allocated");
-        // printf("**syscall.c** --shscallAllocPage-- : cpaces agter page allocated");
-        //showCspace(current->cspace);
+    //
+      
+      
+      
+      
+      
+    unsigned * page;
+    if (DEBUG)
+        printf("**syscall.c** --syscallMapPageTable-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
+    if (!isTableMapped(current->pdir, addr) && (page=allocPage())) {
+        if (DEBUG)
+            printf("**syscall.c** --syscallMapPageTable-- : Page table for 0x%x doesn't exists, creating new page table\n", addr);
+        mapPageTable(current->pdir, addr, toPhys(page));
         printf("**syscall.c** --syscallMapPageTable-- : SUCCESS\n");
         ctxt->regs.eax = 1;
     } else {
         printf("**syscall.c** --syscallMapPageTable-- : FAIL\n");
         ctxt->regs.eax = 0;
     }
+
+
     switchToUser(ctxt);
 }
 

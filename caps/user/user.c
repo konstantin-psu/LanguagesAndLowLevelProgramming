@@ -63,6 +63,7 @@ void cmain() {
   mapPageTable(21, stomp+0x800000); // 8MB further
   allocPage(memoryPool,      20/*slot*/);
   mapPage(20, stomp);
+  mapPage(20, stomp+0x800000);
   dump();
 
   // Loop to avoid terminating user program: ------------------------------
