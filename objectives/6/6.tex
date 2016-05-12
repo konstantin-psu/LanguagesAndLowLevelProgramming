@@ -80,8 +80,8 @@
 \pagebreak
 
 %\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
-\section{Topic 6.}  Describe the motivation, implementation, and application of microkernel
-abstractions for managing address spaces, threads, and interprocess communication (IPC). \\
+        \section{Topic 6.}  Describe the motivation, implementation, and application of microkernel
+        abstractions for managing address spaces, threads, and interprocess communication (IPC). \\
 
              \subsection{Motivation}
              %STARTSTART
@@ -90,88 +90,120 @@ abstractions for managing address spaces, threads, and interprocess communicatio
              implemented as a set of independent services. Microkernel provides only minimum set of
              abstraction over hardware, such as
              \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
-    \item Address Spacing
-\item Inter-process Communication (IPC)
-    \item Thread Management
-    \item Unique Identifiers
-    \end{enumerate}
-    Systems that use this approach will implement only the functionality needs to operate, have
-    smaller footprint. All nonessential for the kernel functions, like network support, are
-    implemented as services. Each service has it's own address space, communication with other
-    services allowed only through Only kernel functionality is in privileged mode (ring 0). 
-    \vspace{0.2cm}
+                 \item Address Spacing
+                 \item Inter-process Communication (IPC)
+                 \item Thread Management
+                 \item Unique Identifiers
+             \end{enumerate}
+        Systems that use this approach will implement only the functionality needs to operate, have
+        smaller footprint. All nonessential for the kernel functions, like network support, are
+        implemented as services. Each service has it's own address space, communication with other
+        services allowed only through Only kernel functionality is in privileged mode (ring 0). 
+        \vspace{0.2cm}
 
-    Advantages
-    \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
-    \item Robustness, a service crash doesn't affect any other part of the system.
-    \item Easier maintenance.
-    \item Enforces modular structure.
-    \item Small size of Trusted Computing Base.
-    \end{enumerate}
-    \vspace{0.2cm}
+        Advantages
+        \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
+            \item Robustness, a service crash doesn't affect any other part of the system.
+            \item Easier maintenance.
+            \item Enforces modular structure.
+            \item Small size of Trusted Computing Base.
+        \end{enumerate}
+        \vspace{0.2cm}
 
-    Disadvantages
-    \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
-    \item Performance loss due to high overhead of services interaction.
-    \item Larger memory footprint.  \item Complicated process management.  \end{enumerate}
+        Disadvantages
+        \begin{enumerate}[-, leftmargin = 0.7cm, nosep]
+            \item Performance loss due to high overhead of services interaction.
+        \item Larger memory footprint.  \item Complicated process management.  \end{enumerate}
 
-    Earlier versions of microkernel implementation suffered from high IPC overhead and
-    did not look promising. L3/L4 (Jochen Liedtke) implementation proved that microkernel can be successful.
-    Liedtke IPC design was 20 times faster than Mach's (fist generation of microkernel).
+            Earlier versions of microkernel implementation suffered from high IPC overhead and
+        did not look promising. L3/L4 (Jochen Liedtke) implementation proved that microkernel can be successful.
+        Liedtke IPC design was 20 times faster than Mach's (fist generation of microkernel).
 
 
-       \pagebreak
-    
-    \subsection{Implementation}
-    \textbf{History}\\
+        \pagebreak
 
-    Mach\\
+        \subsection{Implementation details}
+        L4 implemented as a single linux server, and multiplexed tasks for user processesm
+        which means that each task is also a server for it's child tasks, basically acting as Virtual CPU.
 
-    L3\\
+        On booting Linux server request memory from it's pager which maps physical memory in
+        the server's address space from it's pager which maps physical memory in the
+        server's address space, then acts as the pager for the user processes it creates.
 
-    L4\\
-
-    \textbf{Implementation details}
-    \begin{enumerate}[1., leftmargin = 0.7cm, nosep]
-    \item \textbf{Thread Management}\\
-        All threads are managed 
-        Kernel Information Page (kernel version, host system info, address space layout
-        info, system call entry points)
+        Each task consists of Threads, memory objects and address space. 
         
-        Predefined KIP adddress
+        \begin{enumerate}[1., leftmargin = 0.7cm, nosep]
+            \item \textbf{Address Spacing} \\
+                Microkernel implement recursive address space model.
 
-        Slow system call LOCK NOP $\rightarrow$ illegal opcode exception $\rightarrow$ kernel $\rightarrow$ load KIP address
-        to context registers $\rightarrow$ return to user mode
-        \\ 
-        and User Thread COntorl Block (One UTCB for eac thread) in the address space
-         Message registers (MRs), and thread control registers (TCRs) 
+                Initial address space $\sigma_0$ represents all physical memory available. Each
+                Threads
+                basic memory operations are granting mapping and unmapping, which can be done only
+                on the address space mapped (available to the process), e.g. Root process can map
+                entire physical memory.
 
-         all UTCBs are in UTCB area
+                Hardware interrupts are handled by user level processes, and triggered by the L4
+                kernel IPC.
+                Each process is a server for it's children, and is responsible for handling page
+                faults of the processes it created. When pagefalut occurs, typically thread's
+                pager creates new mapping and send it to faulty thread.
 
-         64 message registers $MR_0 - MR_63$
+                Microkernel supports flexpages - simple pages that can be varied in size. In
+                practice all pages larger than 4KB are just a collection of multiple 4K
+                pages.
 
-         Miscellaneous fields: error code, exceptin handler pager acceptor
-         
-         UTCB address  points to the middle of the UTCB \\
+            \item \textbf{Thread Management}\\
 
-         User processes can read/write data to any UTCB available
+                L4 uses thread multiplexing mechanism, with thread0 being the first thread. Each
+                thread can create new thread's and multiplex it's resources.
 
-         thread priority is stored in protected structure, any data read form UTCB cannot be
-         trusted and must  be validated by the kernel before use.
+                Each thread has associated Pager, Exception Handler and Scheduler threads.
+                For handling page faults, exceptions and scheduling. Schedule threads can set
+                scheduling parameters, like priority, time slice and quantum. Time slices can
+                be donated to any other thread, or to kernel through donating time to
+                nilthreads.
 
-         UTCB mappings created by kernel
-
-     \item \textbf{Address Spacing}
-
-     \item \textbf{Inter-process Communication (IPC)}
+                Kernel Information Page (kernel version, host system info, address space layout
+                info, system call entry points), is available to all threads through either a
+                predefined address or, through LOCK NOP call.
 
 
+                Each User has User Thread Control Block (UTCB), which is used for communication
+                with kernel.
 
-    \end{enumerate}
+                Threads can be referenced by thread id's. System defines global Thread ID,
+                global interrupt ID, local thread ID, millthread, anythread, and
+                anylocalthread. Global Ids are considered to be a bad practice since any thread
+                can reference any other thread by it's local id, this potentially can lead to
+                DOS attacks. Even if global thread ID is unknown it can be guessed (this is one
+                of the problems seL4 tries to solve by using capabilities).
 
-    %ENDEND
+                Thread management is done through ThreadControl system calls.
+
+            \item \textbf{Inter-process Communication (IPC)}
+                System calls are expensive, therefore should be avoided. IPC is based on this
+                principle and combines send and receive into a single system call.
+                Before IPC system call thread loads message registers into the UTCB with a
+                message to send, after IPC is complete sender thread is resumed, and it can
+                read response from the receiver by reading UTCB registers.
+
+                IPC can be blocking or unblocking depending on implementation. Some message
+                registers are passed in CPU, if message is small enough to fit into real
+                registers IPC call performance will be a lot faster. Kernel implementation uses
+                this since most of the messages \%60 to \%70 percent are small. Larger messages
+                transfer is a lot slower. In earlier microkernel generations it was done by
+                double copying message from sender to kernel and to receiver, which requires
+                TLB flush. L4 avoids this by
+                sending a mapping from target's area to sender, temporarily sharing region of
+                memory.
+
+        \end{enumerate}
+
+        %ENDEND
 
     \pagebreak
 
     \subsection{Application}
-    \end{document}
+
+    Best application for Microkernel based OSs is Embedded and VM system.
+\end{document}
