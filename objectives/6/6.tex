@@ -118,6 +118,9 @@ abstractions for managing address spaces, threads, and interprocess communicatio
     Earlier versions of microkernel implementation suffered from high IPC overhead and
     did not look promising. L3/L4 (Jochen Liedtke) implementation proved that microkernel can be successful.
     Liedtke IPC design was 20 times faster than Mach's (fist generation of microkernel).
+
+
+       \pagebreak
     
     \subsection{Implementation}
     \textbf{History}\\
@@ -131,6 +134,7 @@ abstractions for managing address spaces, threads, and interprocess communicatio
     \textbf{Implementation details}
     \begin{enumerate}[1., leftmargin = 0.7cm, nosep]
     \item \textbf{Thread Management}\\
+        All threads are managed 
         Kernel Information Page (kernel version, host system info, address space layout
         info, system call entry points)
         
@@ -157,9 +161,9 @@ abstractions for managing address spaces, threads, and interprocess communicatio
 
          UTCB mappings created by kernel
 
-    \item Address Spacing
+     \item \textbf{Address Spacing}
 
-    \item Inter-process Communication (IPC)
+     \item \textbf{Inter-process Communication (IPC)}
 
 
 
@@ -167,6 +171,7 @@ abstractions for managing address spaces, threads, and interprocess communicatio
 
     %ENDEND
 
+    \pagebreak
 
     \subsection{Application}
     \end{document}
