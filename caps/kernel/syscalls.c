@@ -464,6 +464,20 @@ void syscallMapPageTable() {
     switchToUser(ctxt);
 }
 
+void syscallRemaining() {
+    printf("**syscall.c** --syscallremaining-- : begin\n");
+    struct Context* ctxt = &current->ctxt;
+    unsigned addr = ctxt->regs.eax;
+    struct Cap*        cap  = getCap(ctxt->regs.edi);
+    void*              obj;
+      
+    ctxt->regs.eax = 1;
+      
+
+    printf("**syscall.c** --syscallremaining-- : Switch back to user\n");
+    switchToUser(ctxt);
+}
+
 /*-------------------------------------------------------------------------
  * Timer interrupt handler:
  */

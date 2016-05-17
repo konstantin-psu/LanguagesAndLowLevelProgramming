@@ -161,4 +161,11 @@ mapPageTable:
 	int	$151
 	ret
 
+
+	.globl	remaining
+remaining:
+	movl	4(%esp), %eax
+	int	$152
+	ret
+
 #-- Done ---------------------------------------------------------------------

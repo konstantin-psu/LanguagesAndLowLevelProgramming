@@ -67,6 +67,7 @@ void cmain() {
   dump();
 
   // Loop to avoid terminating user program: ------------------------------
+  remaining(4);
   puts("\n\nUser code does not return\n");
   for (;;) { /* Don't return! */
   }

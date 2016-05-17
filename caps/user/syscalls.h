@@ -32,6 +32,7 @@ extern unsigned allocUntyped(unsigned ucap, unsigned slot, unsigned bits);
 extern unsigned allocCspace(unsigned ucap, unsigned slot);
 extern unsigned allocPage(unsigned ucap, unsigned slot);
 extern unsigned allocPageTable(unsigned ucap, unsigned slot);
+extern unsigned remaining(unsigned ucap);
 
 /*-------------------------------------------------------------------------
  * Mapping objects in to an address space:
