@@ -173,4 +173,16 @@ getTotalTicks:
 	movl	4(%esp), %ecx
 	int	$153
 	ret
+
+	# System call to allocate a new page table:
+	#    PrintString(ucap, addr)
+	#    | retn | ucap | addr |
+	#    |      | ecx  | edi  |
+	#    | 0    | 4    | 8    |
+	.globl	printString
+printString:
+	movl	4(%esp), %ecx
+	movl	8(%esp), %edi
+	int	$154
+	ret
 #-- Done ---------------------------------------------------------------------

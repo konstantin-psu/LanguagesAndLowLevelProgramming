@@ -34,6 +34,7 @@ extern unsigned allocPage(unsigned ucap, unsigned slot);
 extern unsigned allocPageTable(unsigned ucap, unsigned slot);
 extern unsigned remaining(unsigned ucap);
 extern unsigned getTotalTicks(unsigned ucap);
+extern unsigned  printString(unsigned wcap, char * addr);
 
 /*-------------------------------------------------------------------------
  * Mapping objects in to an address space:

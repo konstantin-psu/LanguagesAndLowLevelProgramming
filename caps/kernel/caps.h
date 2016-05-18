@@ -74,7 +74,7 @@ struct WindowCap {
   enum Captype   type;      // WindowCap
   struct Window* window;    // Pointer to the window
   unsigned       perms;     // Permissions (CAN_{cls,setAttr,putchar})
-  unsigned       unused[1];
+  unsigned       MAX_BUFFER;
 };
 
 #define CAN_cls      0x4    // confers permission to clear screen
@@ -227,7 +227,7 @@ struct PageTableCap* pageTableCap(struct Cap* cap, struct Ptab* ptab) {
 struct TimeCap {
   enum Captype type;
   unsigned     resolution;
-  unsigned     indored[2];
+  unsigned     ignored[2];
 };
 
 static inline void timeCap(struct Cap* cap, unsigned attr) {

@@ -313,6 +313,7 @@ initIDT:# Add descriptors for exception & interrupt handlers:
 	idtcalc handler=handleMapPageTable,   slot=151, dpl=3
 	idtcalc handler=handleremaining,      slot=152, dpl=3
 	idtcalc handler=handleGetTotalTicks,  slot=153, dpl=3
+	idtcalc handler=handlePrintString,    slot=154, dpl=3
 
 	# Install the new IDT:
 	lidt	idtptr
@@ -479,6 +480,9 @@ handleremaining:
 
 handleGetTotalTicks:
 	syscall	syscallGetTotalTicks
+
+handlePrintString:
+	syscall	syscallPrintString
 #--------------------------------------------------------------------------
 # Switch to user mode:  Takes a single parameter, which provides the
 # initial context for the user process.

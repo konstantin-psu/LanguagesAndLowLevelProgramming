@@ -510,6 +510,32 @@ void syscallGetTotalTicks() {
     switchToUser(ctxt);
 }
 
+// void syscallPutchar() {
+//     struct WindowCap* wcap = getWindowCap();
+//     if (wcap && (wcap->perms & CAN_putchar)) {
+//         wputchar(wcap->window, current->ctxt.regs.eax);
+//     }
+//     switchToUser(&current->ctxt);
+// }
+
+void syscallPrintString() {
+    printf("**syscall.c** --syscallPrintString-- : begin\n");
+    struct Context* ctxt = &current->ctxt;
+    struct WindowCap* wcap = getWindowCap();
+    if (wcap) {
+      printf("**syscall.c** --syscallPrintString-- : SUCC capability is found working...");
+      ctxt->regs.eax = 1;
+      wputs(wcap->window,(char *)(ctxt->regs.edi));
+    } else {
+      printf("**syscall.c** --syscallPrintString-- : ERROR no window capability");
+      ctxt->regs.eax = 0;
+    }
+      
+
+    printf("**syscall.c** --syscallPrintString-- : Switch back to user\n");
+    switchToUser(ctxt);
+}
+
 /*-------------------------------------------------------------------------
  * Timer interrupt handler:
  */

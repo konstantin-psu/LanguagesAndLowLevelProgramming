@@ -13,6 +13,7 @@ struct Process {
   struct Context ctxt;
   struct Pdir*   pdir;
   struct Cspace* cspace;
+  unsigned * buf;
 };
 
 extern struct Process proc[];     // The set of all user-level processes
