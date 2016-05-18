@@ -24,6 +24,19 @@ void showUntyped() {
   }
 }
 
+unsigned untypedSize() {
+  unsigned size = 0;
+  struct UntypedCap* cap = untyped;
+  unsigned           len;
+  struct UntypedCap* ucap;
+  for (int i=0; i<numUntyped; i++) {
+    ucap = (struct UntypedCap*)cap;
+    len = (1<<ucap->bits);
+    size += len;
+  }
+  return size;
+}
+
 static void insertUntyped(void* memory, unsigned bits) {
   printf("insert untyped %x (%d, %zd)\n", memory, bits, 1<<bits);
   struct UntypedCap* ucap = (struct UntypedCap*)untyped;

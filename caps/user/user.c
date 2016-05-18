@@ -13,6 +13,7 @@ void kputs(unsigned cap, char* s) {
 
 void cmain() {
   int i;
+  unsigned currentTime = 0;
 
   // Basic tests of console and window output: ----------------------------
   cls();
@@ -37,7 +38,7 @@ void cmain() {
     capmove(4, 1, MOVE);
     printf("My process id is %x\n", kputc(CONSOLE, 'E'));
   } else {
-    printf("I don't have a capability for the console");
+    printf("I don't have a capability for the console\n\n");
   }
 
   // Allocate memory for this process without a capability: ---------------
@@ -67,7 +68,10 @@ void cmain() {
   dump();
 
   // Loop to avoid terminating user program: ------------------------------
-  remaining(4);
+  unsigned availM = (unsigned) remaining(3);
+  printf("memory available 0x%x\n", availM);
+  currentTime = getTotalTicks(4);
+  printf("Total tiks so far %d\n", currentTime);
   puts("\n\nUser code does not return\n");
   for (;;) { /* Don't return! */
   }

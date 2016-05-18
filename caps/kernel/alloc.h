@@ -12,6 +12,7 @@ extern void      initMemory(unsigned* hdrs, unsigned* mmap);
 extern void      showUntyped();
 extern unsigned* allocPage();
 extern unsigned  copyPage(unsigned phys);
+extern unsigned  untypedSize();
 
 #endif
 /*-----------------------------------------------------------------------*/

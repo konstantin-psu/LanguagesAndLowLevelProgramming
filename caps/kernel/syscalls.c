@@ -14,6 +14,8 @@
 
 #define DEBUG 1
 
+static unsigned ticks = 0;
+
 void mapPageTable(struct Pdir* pdir, unsigned virt, unsigned phys) {
   // Mask out the least significant 12 bits of virt and phys.
   virt = alignTo(virt, PAGESIZE);
@@ -394,11 +396,6 @@ void syscallMapPage() {
     showPdir(current->pdir);
     // printf("**syscall.c** --shscallAllocPage-- : current cpaces");
     //
-      
-      
-      
-      
-      
     unsigned * page;
     if (DEBUG)
         printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
@@ -414,6 +411,7 @@ void syscallMapPage() {
     }
     switchToUser(ctxt);
 }
+
 
 void syscallMapPageTable() {
     printf("**syscall.c** --syscallMapPageTable-- : begin\n");
@@ -464,17 +462,51 @@ void syscallMapPageTable() {
     switchToUser(ctxt);
 }
 
+// static inline struct UntypedCap* isUntypedCap(struct Cap* cap) {
+//   return (cap->type==UntypedCap) ? (struct UntypedCap*)cap : 0;
+// }
+
+// struct UntypedCap* getUntypedCap() {
+//  return isPageUntypedCap(current->cspace->caps + cptr(current->ctxt.regs.ecx));
+// }
+
 void syscallRemaining() {
     printf("**syscall.c** --syscallremaining-- : begin\n");
     struct Context* ctxt = &current->ctxt;
-    unsigned addr = ctxt->regs.eax;
-    struct Cap*        cap  = getCap(ctxt->regs.edi);
-    void*              obj;
-      
-    ctxt->regs.eax = 1;
+    struct UntypedCap* ucap = getUntypedCap();
+    if (ucap) {
+      ctxt->regs.eax = (1<<ucap->bits) - ucap->next;
+      printf("**syscall.c** --syscallremaining-- : found 0x%x\n", ctxt->regs.eax);
+    } else {
+      ctxt->regs.eax = 0;
+    }
       
 
     printf("**syscall.c** --syscallremaining-- : Switch back to user\n");
+    switchToUser(ctxt);
+}
+
+static inline struct TimeCap* isTimeCap(struct Cap* cap) {
+   return (cap->type==TimeCap) ? (struct TimeCap*)cap : 0;
+}
+
+struct TimeCap* getTimeCap() {
+    return isTimeCap(current->cspace->caps + cptr(current->ctxt.regs.ecx));
+}
+
+void syscallGetTotalTicks() {
+    printf("**syscall.c** --syscallGetTotalTicks-- : begin\n");
+    struct Context* ctxt = &current->ctxt;
+    struct TimeCap* tcap = getTimeCap();
+    if (tcap) {
+      ctxt->regs.eax = (ticks >> tcap->resolution) << tcap->resolution;
+      printf("**syscall.c** --syscallGetTotalTicks-- : total tiks %d masked %d\n", ticks, ctxt->regs.eax);
+    } else {
+      ctxt->regs.eax = 0;
+    }
+      
+
+    printf("**syscall.c** --syscallGetTotalTicks-- : Switch back to user\n");
     switchToUser(ctxt);
 }
 
@@ -482,7 +514,6 @@ void syscallRemaining() {
  * Timer interrupt handler:
  */
 static void tick() {
-    static unsigned ticks = 0;
     static char*    spin = "-\\|/";  // characters for a rotatating spinner
     static unsigned pos  = 0;        // current position within spinner
     ticks++;

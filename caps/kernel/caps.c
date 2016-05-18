@@ -75,6 +75,12 @@ void showCap(struct Cap* cap) {
       break;
     }
 
+    case TimeCap  : {
+      struct TimeCap * tcap = (struct TimeCap*)cap;
+      printf("TimeCap, time resolution=%x", tcap->resolution);
+      break;
+    }
+
     default         :
       printf("Unknown capability (%d)", cap->type);
   }

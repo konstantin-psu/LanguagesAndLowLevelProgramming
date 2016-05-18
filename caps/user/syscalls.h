@@ -33,6 +33,7 @@ extern unsigned allocCspace(unsigned ucap, unsigned slot);
 extern unsigned allocPage(unsigned ucap, unsigned slot);
 extern unsigned allocPageTable(unsigned ucap, unsigned slot);
 extern unsigned remaining(unsigned ucap);
+extern unsigned getTotalTicks(unsigned ucap);
 
 /*-------------------------------------------------------------------------
  * Mapping objects in to an address space:

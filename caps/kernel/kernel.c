@@ -77,12 +77,14 @@ void kernel() {
             &upperRight,
             /*CAN_cls|*/CAN_setAttr|CAN_putchar);
     donateUntyped(proc[0].cspace->caps + 3, 0);
+    timeCap(proc[0].cspace->caps + 4, 3);
     showCspace(proc[0].cspace);
 
     // ----------------------------------------------------------------------
     // Configure proc[1]:
     initProcess(proc+1, hdrs[7], hdrs[8], hdrs[9]);
     cspaceLoop(proc[1].cspace, 0);
+    timeCap(proc[1].cspace->caps + 4, 3);
     windowCap(proc[1].cspace->caps  + 2,
             &lowerRight,
             /*CAN_cls|*/CAN_setAttr|CAN_putchar);

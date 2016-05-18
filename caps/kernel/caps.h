@@ -18,7 +18,8 @@ enum Captype {
   CspaceCap    = 3,
   UntypedCap   = 4,
   PageCap      = 5,
-  PageTableCap = 6
+  PageTableCap = 6,
+  TimeCap      = 7
 };
 
 struct Cap {
@@ -221,6 +222,19 @@ struct PageTableCap* pageTableCap(struct Cap* cap, struct Ptab* ptab) {
   ptcap->type = PageTableCap;
   ptcap->ptab = ptab;
   return ptcap;
+}
+
+struct TimeCap {
+  enum Captype type;
+  unsigned     resolution;
+  unsigned     indored[2];
+};
+
+static inline void timeCap(struct Cap* cap, unsigned attr) {
+  struct TimeCap* tcap = (struct TimeCap*)cap;
+  printf("Setting time cap at %x\n", tcap);
+  tcap->type = TimeCap;
+  tcap->resolution = attr;
 }
 
 #endif

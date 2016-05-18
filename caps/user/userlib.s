@@ -164,8 +164,13 @@ mapPageTable:
 
 	.globl	remaining
 remaining:
-	movl	4(%esp), %eax
+	movl	4(%esp), %ecx
 	int	$152
 	ret
 
+	.globl	getTotalTicks
+getTotalTicks:
+	movl	4(%esp), %ecx
+	int	$153
+	ret
 #-- Done ---------------------------------------------------------------------
