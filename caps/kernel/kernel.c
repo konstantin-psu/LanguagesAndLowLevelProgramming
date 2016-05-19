@@ -67,6 +67,8 @@ void kernel() {
 
     // ----------------------------------------------------------------------
     // Configure proc[0]:
+    // procl;
+    // initProcessl(&(procl), hdrs[7], hdrs[8], hdrs[9]);
     initProcess(proc+0, hdrs[7], hdrs[8], hdrs[9]);
     printf("cspace is at %x, cap is at %x\n",
             proc[0].cspace,

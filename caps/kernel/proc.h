@@ -10,12 +10,15 @@
  * User-level processes:
  */
 struct Process {
+  struct Process * next;
+  struct Process * prev;
   struct Context ctxt;
   struct Pdir*   pdir;
   struct Cspace* cspace;
-  unsigned * buf;
 };
 
+
+// extern struct Process procl;
 extern struct Process proc[];     // The set of all user-level processes
 extern struct Process* current;   // Identifies the current process
 
@@ -23,6 +26,10 @@ extern void initProcess(struct Process* proc,
                         unsigned lo,
                         unsigned hi,
                         unsigned entry);
+// extern void initProcessl(struct Process* proc,
+//                         unsigned lo,
+//                         unsigned hi,
+//                         unsigned entry);
 extern void reschedule();
 
 #endif

@@ -69,10 +69,15 @@ void cmain() {
 
   // Loop to avoid terminating user program: ------------------------------
   unsigned availM = (unsigned) remaining(3);
+  char * trickPrint = 0xc0000000;
   printf("memory available 0x%x\n", availM);
   currentTime = getTotalTicks(4);
   printf("Total tiks so far %d\n", currentTime);
   printString(2, "Print String Call TEST");
+
+  // Should cause an exception
+  // printString(2, trickPrint);
+
   puts("\n\nUser code does not return\n");
   for (;;) { /* Don't return! */
   }
