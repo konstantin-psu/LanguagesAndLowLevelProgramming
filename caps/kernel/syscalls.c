@@ -20,7 +20,7 @@ static unsigned kernelStart = 0xc0000000;
 void mapPageTable(struct Pdir* pdir, unsigned virt, unsigned phys) {
     // Mask out the least significant 12 bits of virt and phys.
     virt = alignTo(virt, PAGESIZE);
-    phys = alignTo(phys, PAGESIZE);
+    // phys = alignTo(phys, PAGESIZE);
 
     // Make sure that the virtual address is in user space.
     if (virt>=KERNEL_SPACE) {
@@ -40,12 +40,62 @@ void mapPageTable(struct Pdir* pdir, unsigned virt, unsigned phys) {
     }
 
     // Which page table entry do we want?
-    struct Ptab* ptab;
+        // struct Ptab* ptab = (struct Ptab *) phys;
+    //struct Ptab* ptab;
     unsigned idx = maskTo(virt >> PAGESIZE, 10);
     if ((pde&1)==0) {  // page table not present; make a new one!
-        ptab = allocPtab();
-        pdir->pde[dir] = toPhys(ptab) | PERMS_USER_RW;
+        // struct Ptab* ptab = (struct Ptab *) phys;
+        // ptab = allocPtab();
+        pdir->pde[dir] = phys | PERMS_USER_RW;
     } 
+}
+
+void mapCapPage(struct Pdir* pdir, unsigned virt, unsigned phys) {
+  // Mask out the least significant 12 bits of virt and phys.
+  virt = alignTo(virt, PAGESIZE);
+  phys = alignTo(phys, PAGESIZE);
+
+  // Make sure that the virtual address is in user space.
+  if (virt>=KERNEL_SPACE) {
+    fatal("virtual address is in kernel space");
+  }
+
+  // Find the relevant entry in the page directory
+  unsigned dir = maskTo(virt >> SUPERSIZE, 10);
+  unsigned pde = pdir->pde[dir];
+
+  // Report a fatal error if there is already a
+  // superpage mapped at that address (this shouldn't
+  // be possible at this stage, but we're programming
+  // defensively).
+  if ((pde&0x81)==0x81) {
+    fatal("Address is already mapped (as a superpage)");
+  }
+
+  // Which page table entry do we want?
+  struct Ptab* ptab;
+  unsigned idx = maskTo(virt >> PAGESIZE, 10);
+  if ((pde&1)==0) {  // page table not present; make a new one!
+    // If there is no page table (i.e., the PDE is empty),
+    // then allocate a new page table and update the pdir
+    // to point to it.   (use PERMS_USER_RW together with
+    // the new page table's *physical* address for this.)
+    fatal("Page Table is not Present");
+  } else {
+    ptab = fromPhys(struct Ptab*, alignTo(pde, PAGESIZE));
+    // If there was an existing page table (i.e., the PDE
+    // pointed to a page table), then report a fatal error
+    // if the specific entry we want is already in use.
+    if (ptab->pte[idx]&1) {
+      fatal("Page is already mapped");
+    }
+  }
+
+  // Add an entry in the page table structure to complete
+  // the mapping of virt to phys.  (Use PERMS_USER_RW
+  // again, this time combined with the value of the
+  // phys parameter that was supplied as an input.)
+  ptab->pte[idx] = phys | PERMS_USER_RW;
 }
 
 /*-------------------------------------------------------------------------
@@ -286,7 +336,7 @@ void syscallAllocPage() {
 
     if (DEBUG) printf("**syscall.c** --shscallAllocPage-- : Allocating new page\n");
     struct UntypedCap* ucap = getUntypedCap();
-    retype(ucap, 6, PAGESIZE,  ctxt->regs.edi, 1);
+    retype(ucap, 5, PAGESIZE,  ctxt->regs.edi, 1);
 }
 
 
@@ -315,6 +365,27 @@ struct PageTableCap* getPageTableCap() {
     return isPageTableCap(current->cspace->caps + cptr(current->ctxt.regs.ecx));
 }
 
+ void mapPageTableFromCap(struct Ptab* ptab, unsigned virt, unsigned phys) {
+  // Mask out the least significant 12 bits of virt and phys.
+  virt = alignTo(virt, PAGESIZE);
+  phys = alignTo(phys, PAGESIZE);
+
+  // Make sure that the virtual address is in user space.
+  if (virt>=KERNEL_SPACE) {
+    fatal("virtual address is in kernel space");
+  }
+
+  unsigned idx = maskTo(virt >> PAGESIZE, 10);
+  if (ptab->pte[idx]&1) {
+    fatal("Page is already mapped");
+  }
+
+  // Add an entry in the page table structure to complete
+  // the mapping of virt to phys.  (Use PERMS_USER_RW
+  // again, this time combined with the value of the
+  // phys parameter that was supplied as an input.)
+  ptab->pte[idx] = phys | PERMS_USER_RW;
+}
 void syscallMapPage() {
     if (DEBUG)  printf("**syscall.c** --syscallMapPage-- : begin\n");
     struct Context* ctxt = &current->ctxt;
@@ -338,20 +409,21 @@ void syscallMapPage() {
     struct Cap*        cap  = getCap(ctxt->regs.edi);
     void*              obj;
 
-    if (DEBUG)
-        if (DEBUG)  printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
-    if (DEBUG)
-        if (DEBUG)  printf("**syscall.c** --syscallMapPage-- : current pdir");
+    if (DEBUG)  printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
+    if (DEBUG)  printf("**syscall.c** --syscallMapPage-- : current pdir");
     showPdir(current->pdir);
     if (DEBUG) printf("**syscall.c** --shscallAllocPage-- : current cpaces");
     //
     unsigned * page;
     if (DEBUG)
         printf("**syscall.c** --syscallMapPage-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
-    if (isTableMapped(current->pdir, addr) && (page=allocPage())) {
+    if (isTableMapped(current->pdir, addr) && (pcap=getPageCap())) {
         if (DEBUG)
             printf("**syscall.c** --syscallMapPage-- : Page table for 0x%x doesn't exists, creating new page table\n", addr);
-        mapPage(current->pdir, addr, toPhys(page));
+        // TODO FIXME
+        mapCapPage(current->pdir, addr, toPhys(pcap->page));
+        if (DEBUG) printf("**syscall.c** --shscallAllocPage-- : current pdir after mapping");
+        showPdir(current->pdir);
         if (DEBUG) printf("**syscall.c** --syscallMapPage-- : SUCCESS\n");
         ctxt->regs.eax = 1;
     } else {
@@ -379,6 +451,12 @@ void syscallMapPageTable() {
     // code of 1 (success) or 0 (error) should be produced as normal.
     struct PageTableCap* pcap = getPageTableCap();
     unsigned addr = ctxt->regs.eax;
+
+    if (addr >= KERNEL_SPACE) {
+        ctxt->regs.eax = 0;
+        switchToUser(ctxt);
+    }
+
     struct Cap*        cap  = getCap(ctxt->regs.edi);
     void*              obj;
     if (DEBUG) printf("**syscall.c** --syscallMapPageTable-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
@@ -387,15 +465,13 @@ void syscallMapPageTable() {
     // printf("**syscall.c** --shscallAllocPage-- : current cpaces");
     //
 
-
-
-
-
     unsigned * page;
     if (DEBUG) printf("**syscall.c** --syscallMapPageTable-- : pcap=%x, slot=%x, addr 0x%x\n", pcap, cap, addr);
-    if (!isTableMapped(current->pdir, addr) && (page=allocPage())) {
+    if (!isTableMapped(current->pdir, addr) && (pcap=getPageTableCap())) {
+        printf("PAGEDIR WHERE WE ARE MAPPING A PAGE!! ++++++++++++++++++++++++++++++++++\n");
+        // showPdir(pcap->ptab);
         if (DEBUG) printf("**syscall.c** --syscallMapPageTable-- : Page table for 0x%x doesn't exists, creating new page table\n", addr);
-        mapPageTable(current->pdir, addr, toPhys(page));
+        mapPageTable(current->pdir, addr, toPhys(((unsigned*)pcap->ptab)));
         if (DEBUG) printf("**syscall.c** --syscallMapPageTable-- : SUCCESS\n");
         ctxt->regs.eax = 1;
     } else {
@@ -615,6 +691,8 @@ void retype(struct UntypedCap * ucap, unsigned type, unsigned bits, unsigned slo
     struct Cap* cap =  cspace ? (cspace->caps + cptr(slot)) : 0;
     void*  obj;
     printf("allocUntyped: bits %d from ucap=%x, slot=%x\n", bits, ucap, cap);
+    struct PageCap*  pcap;
+    struct PageTableCap*  ptcap;
     unsigned error = 0;
     if (ucap && cap  && isNullCap(cap)) // valid untyped capability && empty destination slot
     {
@@ -630,7 +708,7 @@ void retype(struct UntypedCap * ucap, unsigned type, unsigned bits, unsigned slo
         } 
         if (!error) {
             for (int i = 0; i< num; i++) {
-                if (obj=alloc(ucap, bits)) { // object allocation succeeds
+                if (obj=alloc(ucap, 4)) { // object allocation succeeds
                     switch (type) {
                         case 3: // Cspace
                             cspaceCap(cap, (struct Cspace*)obj);
@@ -639,10 +717,16 @@ void retype(struct UntypedCap * ucap, unsigned type, unsigned bits, unsigned slo
                             untypedCap(cap, obj, bits);
                             break;
                         case 5:  // Page Capability
-                            pageCap(cap, (struct PageCap*)obj);
+                            pcap = (struct PageCap*)obj;
+                            unsigned * page = (unsigned *)alloc(ucap,2);
+                            pcap->page = page;
+                            pageCap(cap, pcap);
                             break;
                         case 6:  // PageTable Capability
-                            pageTableCap(cap, (struct PageTableCap*)obj);
+                            ptcap = (struct PageTableCap*)obj;
+                            struct Ptab* ptabe = (struct Ptab *)alloc(ucap,bits);
+                            ptcap->ptab = ptabe;
+                            pageTableCap(cap, ptcap);
                             break;
                         default:
                             error++;
