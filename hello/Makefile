@@ -23,10 +23,12 @@ all:	cdrom.iso
 run:	cdrom.iso
 	$(QEMU) -m 32 -serial stdio -cdrom cdrom.iso
 
+.PHONY: cdrom.iso
 cdrom.iso: cdrom
 	grub-mkrescue -o cdrom.iso cdrom
 
 # make a basic cdrom image
+.PHONY: cdrom
 cdrom: grub.cfg hello
 	mkdir -p cdrom/boot/grub
 	cp grub.cfg cdrom/boot/grub

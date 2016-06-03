@@ -1,0 +1,128 @@
+\documentclass{article}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage[plain]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumerate}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{forest}
+\usepackage[shortlabels]{enumitem}
+\setlist[enumerate, 1]{1\textsuperscript{o}}
+\lstset { %
+    language=C++,
+        backgroundcolor=\color{black!5}, % set backgroundcolor
+            basicstyle=\footnotesize,% basic font setting
+}
+
+%\usetikzlibrary{automata,positioning}
+\usetikzlibrary{positioning,shapes,shadows,arrows,automata}
+
+%
+% Basic Document Settings
+%
+
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1}
+
+\pagestyle{fancy}
+\lhead{\hmwkAuthorName}
+\rhead{ (\hmwkClassInstructor\ \hmwkClassTime): \hmwkTitle}
+\lfoot{\lastxmark}
+\cfoot{\thepage}
+
+\renewcommand\headrulewidth{0.4pt}
+\renewcommand\footrulewidth{0.4pt}
+
+\setlength\parindent{0pt}
+
+\setcounter{secnumdepth}{0}
+\newcounter{partCounter}
+
+
+\newcommand{\hmwkTitle}{Portfolio submission, Topic 10}
+\newcommand{\hmwkDueDate}{June 3, 2016}
+\newcommand{\hmwkClass}{CS510 Languages and Low Level Programming}
+\newcommand{\hmwkClassTime}{Spring 2016}
+\newcommand{\hmwkClassInstructor}{Mark P. Jones}
+\newcommand{\hmwkAuthorName}{Konstantin Macarenco}
+
+
+\title{
+    \vspace{2in}
+    \textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+        \normalsize\vspace{0.1in}\small{Due\ on\ \hmwkDueDate\ at 11:59pm}\\
+        \vspace{0.1in}\large{\textit{\hmwkClassInstructor\ \hmwkClassTime}}
+    \vspace{3in}
+}
+
+\author{\textbf{\hmwkAuthorName}}
+\date{}
+
+\renewcommand{\part}[1]{\textbf{\large Part \Alph{partCounter}}\stepcounter{partCounter}\\}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+%\begin{enumerate}[(a), leftmargin = 0.7cm, nosep]
+        \section{Topic 10.  Use practical case studies to evaluate and compare language design proposals.}
+
+%STARTSTART
+
+        With the lack of specific language for Low Level Programming, I picked two languages with
+        Parallel Programming in mind (General C + MPI library, and Chapel - new domain specific
+        language for parallel programming created by Cray). 
+        Parallel programming complexity is similar, if not greater than
+        LLP, with many potential issues on the top of regular mistakes there are Concurrency Issues
+        such as race conditions, and deadlocks.
+        MPI - message passing interface is a well known standard for external parallel computing.
+        Chapel - is build upon C/MPI is much simpler - it is a modern high level language that hides
+        all the intricacies of Message Passing. Chapel syntax is similar to Python, with many alike
+        features. Chapel uses C/MPI as an intermediate layer, i.e. first it compiles to C.\\
+    
+        I Compare implementation of Jacobi-Laplace algorithm in C/MPI vs Chapel. 
+        
+        Jacobi-Laplace is a
+        simple approach for solving Laplace equation with $O(n^3)$ complexity, used in many
+        scientific applications. As $n\rightarrow \infty$ performance is greatly reduced, hence the
+        desire to run it in parallel mode.\\
+        Laplace equation : 
+        ${\phi^{t+1}}_{i,j} = \cfrac{1}{4} ({\phi^{t}}_{i+1,j} + {\phi^{t}}_{i-1,j} +
+        {\phi^{t}}_{i,j+1} + {\phi^{t}}_{i,j-1}), 0 < i, j< N$ , i.e. current cell in a matrix is
+        equal to a quarter of the sum of it's neighboring cells.\\
+    
+        External im
+        
+
+        \begin{enumerate}[1.]
+            \item Simple C/MPI implementation:
+                \begin{itemize}
+                    \item Complexity - implementing it in C/MPI requires matrix partition, 
+                    \item Size - $\approx 620\ lines$ with comments
+                \end{itemize}
+
+            \item Simple Chapel implementation:
+                \begin{itemize}
+                    \item Complexity - 
+                    \item Size - $\approx 60\ lines$ with comments
+                \end{itemize}
+        \end{enumerate}
+
+
+%ENDEND
+\end{document}
