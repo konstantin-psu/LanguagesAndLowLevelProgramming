@@ -1,0 +1,6 @@
+export CHPL_HOME=/pkgs/chapel/chapel-1.12.0
+export CHPL_HOST_PLATFORM=linux64
+export CHPL_COMM=gasnet
+export GASNET_SPAWNFN=S
+export GASNET_SSH_SERVERS="bevatron catron cosmotron cyclotron electron glueball graviton hadron higgs inflaton lepton luxon megatron meson muon neutron pentaquark pion plekton positron proton quark skyrmion sneutron squark synchrotron tachyon tron ultron wino adelie african chatham chinstrap dege emperor erect-crested fiordland galapagos gentoo humboldt icadyptes inguza kairuku king little macaroni magellanic perudyptes ptarmigan rockhopper royal waimanu white-flipper yellow-eyed ..."
+export SSH_CMD=ssh

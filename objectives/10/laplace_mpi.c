@@ -419,7 +419,7 @@ void iterate ( double w, double M[][nodeedge+2], double result[][n], int rank,
       done = 1;
     }
 
-    if ( ( it % 20.0 == 0.0 ) && ( done != 1 ) )
+    if ( ( it % 20 == 0 ) && ( done != 1 ) )
     { 
       diff = 0.0;
       for ( i = 1; i <= nodeedge; i++ )
