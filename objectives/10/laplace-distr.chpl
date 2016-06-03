@@ -1,10 +1,9 @@
 //------------------------------------------------------------------------- 
-// This is supporting software for CS415/515 Parallel Programming.
 // Copyright (c) Portland State University.
 //------------------------------------------------------------------------- 
 
 // Jacobi method for solving a Laplace equation.  
-// (shared-memory version)
+// 
 //
 use BlockDist;
 use Time;

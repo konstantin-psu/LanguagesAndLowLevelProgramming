@@ -16,7 +16,7 @@
 \usepackage[shortlabels]{enumitem}
 \setlist[enumerate, 1]{1\textsuperscript{o}}
 \lstset { %
-    language=C++,
+    language=bash,
         backgroundcolor=\color{black!5}, % set backgroundcolor
             basicstyle=\footnotesize,% basic font setting
 }
@@ -86,7 +86,9 @@
 
         With the lack of specific language for Low Level Programming, I picked two languages with
         Parallel Programming in mind (General C + MPI library, and Chapel - new domain specific
-        language for parallel programming created by Cray). 
+        language for parallel programming created by Cray).  Even though domain is different it
+        shows that language designed for a specific domain can drastically aid applications
+        development.
         Parallel programming complexity is similar, if not greater than
         LLP, with many potential issues on the top of regular mistakes there are Concurrency Issues
         such as race conditions, and deadlocks.
@@ -106,22 +108,95 @@
         {\phi^{t}}_{i,j+1} + {\phi^{t}}_{i,j-1}), 0 < i, j< N$ , i.e. current cell in a matrix is
         equal to a quarter of the sum of it's neighboring cells.\\
     
-        External im
+        External implementation requires matrix partitioning, and message passing when computing
+        border elements.\\
+        
+        \textbf{Implementation comparison chart - next page.}
+
+        \textbf{Both implementations are included to the submission} 
         
 
-        \begin{enumerate}[1.]
-            \item Simple C/MPI implementation:
-                \begin{itemize}
-                    \item Complexity - implementing it in C/MPI requires matrix partition, 
-                    \item Size - $\approx 620\ lines$ with comments
-                \end{itemize}
+        \begin{itemize}
+            \item laplace-mpi.c - C/MPI
+            \item chapel-distr.chpl - Chapel
+            \item Makefile
+            \item laplace-distr.c - Chapel Generated code (not to be compiled or executed).
+            \item chpl-prep - Environment setup for running chapel appliactions
+            \item mpi-prep - Environment setup required for running MPI applications
+        \end{itemize}
+        \textbf{Building and running instructions}:\\ 
+        
+        The code intended to be build on linuxlab machines.
+        \begin{lstlisting}
+make
+# MPI -
+    source mpi-prep && mpirun -n 4 laplace_mpi  # number of remote procs must be 4 for 
+        this application
+# Chapel
+    source chpl-prep && ./laplace-distr -nl [number of remote procs] # number of 
+        procs can not exceed 20 
+        \end{lstlisting}
 
-            \item Simple Chapel implementation:
-                \begin{itemize}
-                    \item Complexity - 
-                    \item Size - $\approx 60\ lines$ with comments
-                \end{itemize}
-        \end{enumerate}
+        \pagebreak
+
+        \begin{centering}
+        \begin{table}[h!]
+            \centering
+            \caption{Languages comparison}
+            \label{my-label}
+            \begin{tabular}{l| p{7.5cm} | p{7.5cm}} \hline
+              Types             &  C/MPI & Chapel \\ \hline
+              Complexity    & 
+                    High. It is quite a challenging task to do int C/MPI, since matrix
+                    mapping to the network done manually, and all communications are manual as well.
+                    The particular implementation I use as an example, divides matrix to 4 regions,
+                    each region is then sent to a remote CPU. It would be even more challenging to 
+                    implement dynamic scalable matrix partitioning.  &  
+
+                    Low. As easy as implementing sequential version, just need to
+                        specify domain mapping. Chapel sequential and MPI implementations are almost
+                        identical, with one exception - matrix needs to be mapped to the distributed
+                        cluster. This is a natively supported operation in Chapel, short and
+                        concise. Unlike C doesn't require any math, or matrix offsets calculation.
+                        Code is simple and easy to read. Chapel includes multiple flexible
+                        partitioning schemes, and also allows custom definition. The problem is
+                        mapped automatically depending on the number of the available remote CPUs.
+                    
+                    \\ \hline
+              Error Prone  &  
+                    No. C doesn't provide much help in error detection, or debugging, if
+                        in case of any fault, especially related to race conditions
+                
+                &  
+                    Yes. Chapel can detect common programming error such as division by zero, out of 
+                    index, etc.
+                \\ \hline
+              Effort     &  
+                    High.  
+                &  
+                    Low.
+                \\ \hline
+              Code Size     &   
+                    Large $\approx 620\ lines$ with comments
+                
+                &  
+                    Small $\approx 60\ lines$ with comments
+                \\ \hline
+                
+              Performance   
+                & High. Area where C shines is performance. C implementation is up to x40 times
+                faster.
+                & Low. At this point of time Chapel suffers from performance issues. It is a new
+                language, that is still undergoing major development, so code produce by chapel
+                compiler is far from being optimal. For example generated C code is $\approx 3K$
+                lines long, besides the size, generated code is far from being optimal.
+
+            \end{tabular}
+        \end{table}
+        \end{centering}
+
+        In conclusion: this comparison clearly demonstrates how usage of domain specific language
+        can simplify the problem and increase developing performance.
 
 
 %ENDEND
