@@ -4,23 +4,23 @@
 
 FLAGS = -std=c99 -g -lm
 CC = mpicc
+CHPL = chpl
+SRCDIR=laplace-distrCompiledSourceCode
 
-all: extsort datagen verify qsort
+all: laplace-distr laplace-mpi
 
-extsort: extsort.c
-	$(CC) $(FLAGS) -o extsort extsort.c
+laplace-distr: laplace-distr.chpl
+	mkdir -p $(SRCDIR)
+	$(CHPL) -o laplace-distr --codegen laplace-distr.chpl --savec $(SRCDIR)
 
-datagen: datagen.c
-	$(CC) $(FLAGS) -o datagen datagen.c
+laplace-mpi: laplace-mpi.c
+	$(CC) $(FLAGS) -o laplace-mpi laplace-mpi.c
 
-verify: verify.c
-	$(CC) $(FLAGS) -o verify verify.c
+mpirun: laplace-mpi
+	mpiruc -n 4 ./laplace-mpi 	
 
-qsort: qsort.c
-	$(CC) $(FLAGS) -o qsort qsort.c
-
-%: %.c
-	$(CC) $(FLAGS) -o $@ $<
+chaplrun: laplace-distr
+	./laplace-distr -nl 2
 
 clean:
-	rm -f extsort datagen verify qsort
+	rm -rf *_real  laplace-distr $(SRCDIR) laplace-mpi
