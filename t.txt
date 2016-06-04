@@ -1,9 +1,0 @@
-allocpage(3, /*slot*/12), allocate page with capability 3
-
-extra two mappings to the same physical page
-
-ConsoleCap - wirte to console windows
-WIndowCap - write to window on the right
-
-slot 12 = 0x0c
-12 14 and 21 random locations

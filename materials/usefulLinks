@@ -1,0 +1,17 @@
+http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html -- IA32 developer manuals
+    This link will take you to a page where you can download Intel's extensive documentation for
+    the Intel and IA32 architectures.  Among the thousands of pages of information provided here,
+    the parts that are likely to be of most use for this course are:
+        Volumes 2A and 2B, which provide reference pages for specific instructions (with initial
+        letter A-M in Volume 2A and N-Z in Volume 2B); useful if you need to check specific details
+        of a particular instruction.  Note that the pdf files include a table of contents section
+        that you can access directly in standard pdf viewers to navigate around the documents.
+        Volume 3A, which covers essential parts of the "operating-system support environment" of the
+        IA32 architecture.
+
+
+https://sourceware.org/binutils/docs-2.25/as/index.html - Using as, the GNU assembler
+
+http://wiki.osdev.org/Main_Page  - The OSDev Wiki
+    A wiki with lots of useful information for people who are interested in operating systems
+    development.
