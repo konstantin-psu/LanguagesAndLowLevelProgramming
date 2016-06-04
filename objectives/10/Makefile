@@ -17,10 +17,10 @@ laplace-mpi: laplace-mpi.c
 	$(CC) $(FLAGS) -o laplace-mpi laplace-mpi.c
 
 mpirun: laplace-mpi
-	mpiruc -n 4 ./laplace-mpi 	
+	mpirun -n 4 ./laplace-mpi 	
 
 chaplrun: laplace-distr
 	./laplace-distr -nl 2
 
 clean:
-	rm -rf *_real  laplace-distr $(SRCDIR) laplace-mpi
+	rm -rf *_real  laplace-distr $(SRCDIR) laplace-mpi laplace_solution.txt
